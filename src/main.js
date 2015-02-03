@@ -36,7 +36,7 @@ class LevelSelector extends UiCorePlugin {
     if (this.isEnabled()) {
       this.listenTo(this.core.mediaControl, "mediacontrol:rendered", this.render)
       Clappr.Mediator.on(this.container.playback.uniqueId + ":fragmentloaded", () => this.onFragmentLoaded())
-      Clappr.Mediator.on(this.container.playback.uniqueId + ':highdefinition', (isHD) => this.onLevelChanged(isHD))
+      Clappr.Mediator.on(this.container.playback.uniqueId + ':levelchanged', (isHD) => this.onLevelChanged(isHD))
     }
   }
 
