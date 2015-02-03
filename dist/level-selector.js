@@ -9,7 +9,7 @@ module.exports = require("./src/main");
 var _ = require('underscore');
 module.exports = {
   'level_selector': _.template('<button data-level-selector-button>  Auto</button><ul>  <li><a href="#" data-level-selector-select="-1">AUTO</a></li>  <% for (var i = 0; i < levels.length; i++) { %>    <li><a href="#" data-level-selector-select="<%= i %>"><%= Math.floor(levels[i].bitrate / 1000) %>kbps</a></li>  <% }; %></ul>'),
-  CSS: {'level_selector': '.level_selector[data-level-selector]{font-smooth:never;-webkit-font-smoothing:none;float:right;margin-top:5px;position:relative}.level_selector[data-level-selector] button{background-color:transparent;color:#fff;font-family:Roboto,"Open Sans",Arial,sans-serif;border:none;font-size:10px}.level_selector[data-level-selector] button:hover{color:#c9c9c9}.level_selector[data-level-selector] button.changing{-webkit-animation:pulse .5s infinite alternate}.level_selector[data-level-selector]>ul{list-style-type:none;position:absolute;bottom:25px;border:1px solid #000;display:none;background-color:#e6e6e6}.level_selector[data-level-selector] li a{color:#444;padding:2px 10px;display:block;text-decoration:none;font-size:10px}.level_selector[data-level-selector] li:hover{background-color:#555;color:#fff}.level_selector[data-level-selector] li:hover a{color:#fff;text-decoration:none}@-webkit-keyframes pulse{0%{color:#fff}50%{color:#ff0101}100%{color:#B80000}}'}
+  CSS: {'level_selector': '.level_selector[data-level-selector]{float:right;margin-top:5px;position:relative}.level_selector[data-level-selector] button{background-color:transparent;color:#fff;font-family:Roboto,"Open Sans",Arial,sans-serif;-webkit-font-smoothing:antialiased;border:none;font-size:10px}.level_selector[data-level-selector] button:hover{color:#c9c9c9}.level_selector[data-level-selector] button.changing{-webkit-animation:pulse .5s infinite alternate}.level_selector[data-level-selector]>ul{list-style-type:none;position:absolute;bottom:25px;border:1px solid #000;display:none;background-color:#e6e6e6}.level_selector[data-level-selector] li a{color:#444;padding:2px 10px;display:block;text-decoration:none;font-size:10px}.level_selector[data-level-selector] li:hover{background-color:#555;color:#fff}.level_selector[data-level-selector] li:hover a{color:#fff;text-decoration:none}@-webkit-keyframes pulse{0%{color:#fff}50%{color:#ff0101}100%{color:#B80000}}'}
 };
 
 
@@ -2909,7 +2909,7 @@ var LevelSelector = function LevelSelector(core) {
   if (this.isEnabled()) {
     this.levels = {};
     this.auto_level = true;
-    this.current_level = 0;
+    this.selected_level = -1;
     this.container = core.mediaControl.container;
     $traceurRuntime.superConstructor($LevelSelector).call(this, core);
   }
@@ -2941,7 +2941,7 @@ var $LevelSelector = LevelSelector;
       Clappr.Mediator.on(this.container.playback.uniqueId + ":fragmentloaded", (function() {
         return $__0.onFragmentLoaded();
       }));
-      Clappr.Mediator.on(this.container.playback.uniqueId + ':highdefinition', (function(isHD) {
+      Clappr.Mediator.on(this.container.playback.uniqueId + ':levelchanged', (function(isHD) {
         return $__0.onLevelChanged(isHD);
       }));
     }
@@ -2950,7 +2950,7 @@ var $LevelSelector = LevelSelector;
     if (this.isEnabled()) {
       this.$el.html(this.template({
         'levels': this.levels,
-        'current_level': this.current_level
+        'current_level': 0
       }));
       var style = Styler.getStyleFor(this.name);
       this.$el.append(style);
@@ -2969,24 +2969,23 @@ var $LevelSelector = LevelSelector;
     this.getCurrentLevel();
     Clappr.Mediator.off(this.container.playback.uniqueId + ":fragmentloaded");
   },
-  onLevelChanged: function(isHD) {
-    this.getCurrentLevel();
-    var display_text = Math.floor(this.levels[this.current_level].bitrate / 1000);
-    display_text += 'kbps';
-    if (this.auto_level) {
-      display_text = 'AUTO (' + display_text + ')';
+  onLevelChanged: function() {
+    var isHD = arguments[0] !== (void 0) ? arguments[0] : false;
+    this.updateText();
+    if (this.selectedIsCurrent()) {
+      this.stopAnimation();
     }
-    this.$el.find('.level_selector button').text(display_text).removeClass('changing');
   },
   onLevelSelect: function(event) {
-    var level = event.target.dataset.levelSelectorSelect;
-    this.auto_level = (level === "-1");
-    this.container.playback.el.globoPlayerSmoothSetLevel(level);
+    this.selected_level = parseInt(event.target.dataset.levelSelectorSelect, 10);
+    this.auto_level = (this.selected_level === -1);
+    this.setLevel(this.selected_level);
     this.toggleContextMenu();
-    if (level == this.getCurrentLevel()) {
-      this.onLevelChanged(false);
+    if (this.auto_level || this.selectedIsCurrent()) {
+      this.updateText();
     } else {
-      this.$el.find('.level_selector button').addClass('changing');
+      this.startAnimation();
+      this.updateText(this.selected_level);
     }
     event.stopPropagation();
     return false;
@@ -2998,8 +2997,34 @@ var $LevelSelector = LevelSelector;
     this.$el.find('.level_selector ul').toggle();
   },
   getCurrentLevel: function() {
-    this.current_level = this.container.playback.el.globoGetLevel();
-    return this.current_level;
+    return this.container.playback.el.globoGetLevel();
+  },
+  setLevel: function(level) {
+    this.container.playback.el.globoPlayerSmoothSetLevel(level);
+  },
+  buttonElement: function() {
+    return this.$el.find('.level_selector button');
+  },
+  startAnimation: function() {
+    this.buttonElement().addClass('changing');
+  },
+  stopAnimation: function() {
+    this.buttonElement().removeClass('changing');
+  },
+  selectedIsCurrent: function() {
+    return (this.selected_level === this.getCurrentLevel());
+  },
+  updateText: function() {
+    var level = arguments[0];
+    if (!level) {
+      level = this.getCurrentLevel();
+    }
+    var display_text = Math.floor(this.levels[level].bitrate / 1000);
+    display_text += 'kbps';
+    if (this.auto_level) {
+      display_text = 'AUTO (' + display_text + ')';
+    }
+    this.buttonElement().text(display_text);
   }
 }, {}, UiCorePlugin);
 module.exports = window.LevelSelector = LevelSelector;
