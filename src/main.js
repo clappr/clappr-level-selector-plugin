@@ -63,6 +63,7 @@ class LevelSelector extends UiCorePlugin {
     this.levels = this.container.playback.el.globoGetLevels()
     this.getCurrentLevel()
     Clappr.Mediator.off(this.container.playback.uniqueId + ":fragmentloaded")
+    this.render()
   }
 
   onLevelChanged(isHD = false) {
