@@ -1,8 +1,11 @@
 var UiCorePlugin = require('ui_core_plugin')
 var JST = require('.././jst')
 var Styler = require('./styler')
+var version = require('../package.json').version
 
 class LevelSelector extends UiCorePlugin {
+
+  static get version() { return version }
 
   get name() { return 'level_selector' }
   get template() { return JST.level_selector }
