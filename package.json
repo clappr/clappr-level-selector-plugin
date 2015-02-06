@@ -1,7 +1,7 @@
 {
   "name": "level-selector",
   "description": "A simple plugin for Clappr that adds support to manually select level on multi-bitrate streams.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "dependencies": {
     "clappr": "latest"
   },

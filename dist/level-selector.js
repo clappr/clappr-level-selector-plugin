@@ -4,7 +4,7 @@ module.exports = require("./src/main");
 
 
 //# sourceURL=/Users/lucas.mundim/Projects/opensource/clappr-level-selector-plugin/index.js
-},{"./src/main":6}],2:[function(require,module,exports){
+},{"./src/main":7}],2:[function(require,module,exports){
 "use strict";
 var _ = require('underscore');
 module.exports = {
@@ -2900,10 +2900,39 @@ System.get("traceur-runtime@0.0.79/src/runtime/polyfills/polyfills.js" + '');
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"_process":4,"path":3}],6:[function(require,module,exports){
+module.exports={
+  "name": "level-selector",
+  "description": "A simple plugin for Clappr that adds support to manually select level on multi-bitrate streams.",
+  "version": "0.0.3",
+  "dependencies": {
+    "clappr": "latest"
+  },
+  "devDependencies": {
+    "browserify": "^6.2.0",
+    "es6ify": "^1.2.0",
+    "gulp": "^3.8.6",
+    "gulp-minify-css": "^0.3.6",
+    "underscore" : "1.7.0",
+    "gulp-rename": "^1.2.0",
+    "gulp-sass": "^0.7.2",
+    "vinyl-source-stream": "^1.0.0",
+    "yargs": "latest",
+    "glob": "^4.0.4",
+    "mkdirp": "^0.5.0",
+    "express": "^4.6.1",
+    "gulp-util": "latest",
+    "gulp-uglify": "^1.0.1",
+    "gulp-livereload": "^2.1.0",
+    "gulp-streamify": "0.0.5"
+  }
+}
+
+},{}],7:[function(require,module,exports){
 "use strict";
 var UiCorePlugin = require('ui_core_plugin');
 var JST = require('.././jst');
 var Styler = require('./styler');
+var version = require('../package.json').version;
 var LevelSelector = function LevelSelector(core) {
   this.core = core;
   if (this.isEnabled()) {
@@ -2968,6 +2997,7 @@ var $LevelSelector = LevelSelector;
     this.levels = this.container.playback.el.globoGetLevels();
     this.getCurrentLevel();
     Clappr.Mediator.off(this.container.playback.uniqueId + ":fragmentloaded");
+    this.render();
   },
   onLevelChanged: function() {
     var isHD = arguments[0] !== (void 0) ? arguments[0] : false;
@@ -3026,12 +3056,14 @@ var $LevelSelector = LevelSelector;
     }
     this.buttonElement().text(display_text);
   }
-}, {}, UiCorePlugin);
+}, {get version() {
+    return version;
+  }}, UiCorePlugin);
 module.exports = window.LevelSelector = LevelSelector;
 
 
 //# sourceURL=/Users/lucas.mundim/Projects/opensource/clappr-level-selector-plugin/src/main.js
-},{".././jst":2,"./styler":7,"ui_core_plugin":"ui_core_plugin"}],7:[function(require,module,exports){
+},{".././jst":2,"../package.json":6,"./styler":8,"ui_core_plugin":"ui_core_plugin"}],8:[function(require,module,exports){
 "use strict";
 var $ = require('zepto');
 var _ = require('underscore');
