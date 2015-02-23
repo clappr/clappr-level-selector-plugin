@@ -2,6 +2,7 @@ var UiCorePlugin = require('ui_core_plugin')
 var JST = require('.././jst')
 var Styler = require('./styler')
 var version = require('../package.json').version
+var Events = Clappr.Events
 
 class LevelSelector extends UiCorePlugin {
 
@@ -37,7 +38,7 @@ class LevelSelector extends UiCorePlugin {
 
   bindEvents() {
     if (this.isEnabled()) {
-      this.listenTo(this.core.mediaControl, "mediacontrol:rendered", this.render)
+      this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_RENDERED, this.render)
       Clappr.Mediator.on(this.container.playback.uniqueId + ":fragmentloaded", () => this.onFragmentLoaded())
       Clappr.Mediator.on(this.container.playback.uniqueId + ':levelchanged', (isHD) => this.onLevelChanged(isHD))
     }
