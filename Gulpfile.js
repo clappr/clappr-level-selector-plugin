@@ -1,7 +1,7 @@
 var gulp = require('gulp');
 var sass = require('gulp-sass');
 var minifyCSS = require('gulp-minify-css');
-var es6ify = require('es6ify');
+var babelify = require('babelify');
 var rename = require('gulp-rename');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
@@ -30,8 +30,7 @@ gulp.task('pre-build', ['sass', 'copy-html', 'copy-css'], function(done) {
 
 gulp.task('build', ['pre-build'], function(b) {
   return browserify()
-    .transform(es6ify.configure(/^(?!.*node_modules)+.+\.js$/))
-    .add(es6ify.runtime)
+    .transform(babelify)
     .add('./index.js', {entry: true})
     .external('ui_plugin')
     .external('ui_object')
@@ -52,8 +51,7 @@ gulp.task('build', ['pre-build'], function(b) {
 
 gulp.task('release', ['pre-build'], function() {
   return browserify()
-    .transform(es6ify.configure(/^(?!.*node_modules)+.+\.js$/))
-    .add(es6ify.runtime)
+    .transform(babelify)
     .add('./index.js', {entry: true})
     .external('ui_plugin')
     .external('ui_object')
