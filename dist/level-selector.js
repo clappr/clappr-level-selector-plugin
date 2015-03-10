@@ -1390,7 +1390,7 @@ module.exports = escape;
 module.exports={
   "name": "level-selector",
   "description": "A simple plugin for Clappr that adds support to manually select level on multi-bitrate streams.",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "license": "MIT",
   "repository": "clappr/clappr-level-selector-plugin",
   "author": {
