@@ -1,4 +1,5 @@
 var JST = require('.././jst');
+var $ = require('zepto');
 
 var Styler = {
   getStyleFor: function(name) {
