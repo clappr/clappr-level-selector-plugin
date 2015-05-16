@@ -49,16 +49,16 @@ class LevelSelector extends UiCorePlugin {
     this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED, this.reload)
     if (this.isEnabled()) {
       this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_RENDERED, this.render)
-      Clappr.Mediator.on(this.getContainer().playback.uniqueId + ":fragmentloaded", () => this.onFragmentLoaded())
-      Clappr.Mediator.on(this.getContainer().playback.uniqueId + ':levelchanged', (isHD) => this.onLevelChanged(isHD))
+      Clappr.Mediator.on(this.getContainer().playback.cid + ":fragmentloaded", () => this.onFragmentLoaded())
+      Clappr.Mediator.on(this.getContainer().playback.cid + ':levelchanged', (isHD) => this.onLevelChanged(isHD))
     }
   }
 
   unBindEvents() {
     this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED)
     this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_RENDERED)
-    Clappr.Mediator.off(this.getContainer().playback.uniqueId + ":fragmentloaded")
-    Clappr.Mediator.off(this.getContainer().playback.uniqueId + ':levelchanged')
+    Clappr.Mediator.off(this.getContainer().playback.cid + ":fragmentloaded")
+    Clappr.Mediator.off(this.getContainer().playback.cid + ':levelchanged')
   }
 
   render() {
@@ -81,8 +81,8 @@ class LevelSelector extends UiCorePlugin {
   }
 
   onFragmentLoaded() {
-    this.levels = this.getContainer().playback.el.globoGetLevels()
-    Clappr.Mediator.off(this.getContainer().playback.uniqueId + ":fragmentloaded")
+    this.levels = this.getContainer().playback.getLevels()
+    Clappr.Mediator.off(this.getContainer().playback.cid + ":fragmentloaded")
     this.render()
   }
 
@@ -121,11 +121,11 @@ class LevelSelector extends UiCorePlugin {
   }
 
   getCurrentLevel() {
-    return this.getContainer().playback.el.globoGetLevel()
+    return this.getContainer().playback.el.getLevel()
   }
 
   setLevel(level) {
-    this.getContainer().playback.el.globoPlayerSmoothSetLevel(level)
+    this.getContainer().playback.el.playerSmoothSetLevel(level)
   }
 
   buttonElement() {
