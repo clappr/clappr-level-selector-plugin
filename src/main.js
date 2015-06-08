@@ -121,11 +121,11 @@ class LevelSelector extends UiCorePlugin {
   }
 
   getCurrentLevel() {
-    return this.getContainer().playback.el.getLevel()
+    return this.getContainer().playback.el.getCurrentLevel()
   }
 
   setLevel(level) {
-    this.getContainer().playback.el.playerSmoothSetLevel(level)
+    this.getContainer().playback.el.playerSetCurrentLevel(level)
   }
 
   buttonElement() {
