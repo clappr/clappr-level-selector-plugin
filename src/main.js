@@ -147,8 +147,8 @@ class LevelSelector extends UiCorePlugin {
     this.buttonElement().removeClass('changing')
   }
 
-  selectedIsCurrent() {
-    return (this.selected_level === this.getCurrentLevel())
+  selectedIsCurrent(currentLevel = this.getCurrentLevel()) {
+    return (this.selected_level === currentLevel)
   }
 
   updateText(level = undefined) {
