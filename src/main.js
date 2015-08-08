@@ -67,11 +67,7 @@ class LevelSelector extends UiCorePlugin {
       var style = Styler.getStyleFor(this.name)
       this.$el.append(style)
       this.core.mediaControl.$el.find('.media-control-right-panel').append(this.el)
-
-      if (this.levels.length !== undefined) {
-        this.onLevelChanged(false)
-      }
-
+      this.updateText(this.currentLevel)
       return this
     }
   }
@@ -102,7 +98,7 @@ class LevelSelector extends UiCorePlugin {
     this.setLevel(this.selected_level)
     this.toggleContextMenu()
     if (this.auto_level || this.selectedIsCurrent()) {
-      this.updateText()
+      this.updateText(this.selected_level)
     } else {
       this.startAnimation()
       this.updateText(this.selected_level)
