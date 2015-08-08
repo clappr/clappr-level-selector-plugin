@@ -128,11 +128,11 @@ class LevelSelector extends UiCorePlugin {
   }
 
   getCurrentLevel() {
-    return this.getContainer().playback.el.getCurrentLevel()
+    return this.currentLevel = (this.currentLevel || this.getPlayback().getCurrentLevelIndex())
   }
 
   setLevel(level) {
-    this.getContainer().playback.el.playerSetCurrentLevel(level)
+    this.getPlayback().setCurrentLevel(level)
   }
 
   buttonElement() {
