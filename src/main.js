@@ -154,16 +154,18 @@ class LevelSelector extends UiCorePlugin {
     return (this.selected_level === currentLevel)
   }
 
-  updateText(level = undefined) {
-    if (!level) {
+  updateText(level) {
+    if (level === undefined || level === -1) {
       level = this.getCurrentLevel()
     }
-    var display_text = Math.floor(this.levels[level].bitrate / 1000)
-    display_text += 'kbps'
-    if (this.auto_level) {
-      display_text = 'AUTO (' + display_text + ')'
+    if (this.levels[level]) {
+      var display_text = Math.floor(this.levels[level].bitrate / 1000)
+      display_text += 'kbps'
+      if (this.auto_level) {
+        display_text = 'AUTO (' + display_text + ')'
+      }
+      this.buttonElement().text(display_text)
     }
-    this.buttonElement().text(display_text)
   }
 }
 
