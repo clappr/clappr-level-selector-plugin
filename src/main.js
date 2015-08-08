@@ -49,16 +49,16 @@ class LevelSelector extends UiCorePlugin {
     this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED, this.reload)
     if (this.isEnabled()) {
       this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_RENDERED, this.render)
-      Clappr.Mediator.on(this.getContainer().playback.cid + ":fragmentloaded", () => this.onFragmentLoaded())
-      Clappr.Mediator.on(this.getContainer().playback.cid + ':levelchanged', (isHD) => this.onLevelChanged(isHD))
+      this.listenTo(this.getPlayback(), Events.PLAYBACK_FRAGMENT_LOADED, this.onFragmentLoaded)
+      this.listenTo(this.getContainer(), Events.CONTAINER_BITRATE, (bitrate) => this.onLevelChanged(bitrate.level))
     }
   }
 
   unBindEvents() {
     this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED)
     this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_RENDERED)
-    Clappr.Mediator.off(this.getContainer().playback.cid + ":fragmentloaded")
-    Clappr.Mediator.off(this.getContainer().playback.cid + ':levelchanged')
+    this.stopListening(this.getPlayback(), Events.PLAYBACK_FRAGMENT_LOADED)
+    this.stopListening(this.getContainer(), Events.CONTAINER_BITRATE)
   }
 
   render() {
