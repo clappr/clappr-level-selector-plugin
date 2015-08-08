@@ -86,10 +86,13 @@ class LevelSelector extends UiCorePlugin {
     this.render()
   }
 
-  onLevelChanged(isHD = false) {
-    this.updateText()
-    if (this.selectedIsCurrent()) {
-      this.stopAnimation()
+  onLevelChanged(level) {
+    if (level !== undefined) {
+      this.currentLevel = level
+      this.updateText(level)
+      if (this.selectedIsCurrent(level)) {
+        this.stopAnimation()
+      }
     }
   }
 
