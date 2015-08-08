@@ -117,7 +117,14 @@ class LevelSelector extends UiCorePlugin {
   }
 
   getContainer() {
-    return this.core.mediaControl.container
+    return this.core.getCurrentContainer()
+  }
+
+  getPlayback() {
+    if (this.getContainer()) {
+      return this.getContainer().playback
+    }
+    return null
   }
 
   getCurrentLevel() {
