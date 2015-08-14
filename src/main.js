@@ -1,10 +1,10 @@
-var UiCorePlugin = require('ui_core_plugin')
+var UICorePlugin = require('Clappr').UICorePlugin
 var JST = require('.././jst')
 var Styler = require('./styler')
 var version = require('../package.json').version
 var Events = Clappr.Events
 
-class LevelSelector extends UiCorePlugin {
+class LevelSelector extends UICorePlugin {
 
   static get version() { return version }
 
