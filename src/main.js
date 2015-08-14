@@ -65,7 +65,7 @@ class LevelSelector extends UICorePlugin {
     if (this.isEnabled()) {
       this.$el.html(this.template({'levels':this.levels, 'current_level': 0}))
       var style = Styler.getStyleFor(this.name)
-      this.$el.append(style)
+      this.$el.append(style[0])
       this.core.mediaControl.$el.find('.media-control-right-panel').append(this.el)
       this.updateText(this.currentLevel)
       return this
