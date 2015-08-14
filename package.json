@@ -18,7 +18,8 @@
     "plugin"
   ],
   "dependencies": {
-    "clappr": "latest"
+    "clappr": "latest",
+    "clappr-zepto": "latest"
   },
   "devDependencies": {
     "browserify": "^6.2.0",
