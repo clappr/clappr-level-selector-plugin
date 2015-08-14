@@ -1,9 +1,9 @@
 var JST = require('.././jst');
-var $ = require('zepto');
+var $ = require('clappr-zepto');
 
 var Styler = {
   getStyleFor: function(name) {
-    return $('<style>').html(JST.CSS[name]);
+    return $('<style></style>').html(JST.CSS[name].toString());
   }
 };
 
