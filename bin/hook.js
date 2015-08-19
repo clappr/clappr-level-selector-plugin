@@ -18,7 +18,7 @@ function format(filePath) {
 }
 
 function copyFiles(asset) {
-  var targetDir = path.extname(asset) === '.js' ? 'dist/' : 'dist/assets';
+  var targetDir = 'dist/';
   fs.createReadStream(asset)
     .pipe(fs.createWriteStream(path.join(targetDir, path.basename(asset))));
 }
