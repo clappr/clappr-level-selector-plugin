@@ -25,6 +25,9 @@
     "clappr": "latest",
     "clappr-zepto": "latest"
   },
+  "browserify-shim": {
+    "Clappr": "Clappr"
+  },
   "devDependencies": {
     "browserify": "^6.2.0",
     "babelify": "5.0.3",
