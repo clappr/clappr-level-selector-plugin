@@ -67,7 +67,7 @@ class LevelSelector extends UICorePlugin {
   }
 
   isEnabled() {
-    return this.core.mediaControl.container.playback.name === 'hls'
+    return this.levels && this.core.mediaControl.container.playback.name === 'flashls'
   }
 
   onFragmentLoaded() {
