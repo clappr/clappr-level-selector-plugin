@@ -4,19 +4,30 @@
   "version": "0.0.9",
   "license": "MIT",
   "repository": "clappr/clappr-level-selector-plugin",
+  "main": "index.js",
+  "scripts": {
+    "release": "node_modules/.bin/webpack --progress -d --optimize-minimize --optimize-dedupe --output-filename level-selector.min.js",
+    "build": "node_modules/.bin/webpack --progress",
+    "watch": "node_modules/.bin/webpack --progress --watch",
+    "test": "karma start --single-run --browsers Chrome",
+    "start": "node_modules/.bin/webpack-dev-server --content-base public/ --output-public-path /latest --hot",
+    "lock": "rm -rf npm-shrinkwrap.json node_modules && npm install --silent && npm shrinkwrap"
+  },
   "author": {
     "name": "Lucas Mundim",
     "email": "lucas.mundim@gmail.com",
     "url": "https://github.com/lucasmundim"
   },
-  "contributors": [{
-    "name": "Flávio Ribeiro",
-    "email": "email@flavioribeiro.com"
-  },
-  {
-    "name": "Bruno Torres",
-    "email": "me@brunotorr.es"
-  }],
+  "contributors": [
+    {
+      "name": "Flávio Ribeiro",
+      "email": "email@flavioribeiro.com"
+    },
+    {
+      "name": "Bruno Torres",
+      "email": "me@brunotorr.es"
+    }
+  ],
   "keywords": [
     "clappr",
     "plugin"
@@ -25,25 +36,22 @@
     "clappr": "latest",
     "clappr-zepto": "latest"
   },
-  "browserify-shim": {
-    "Clappr": "Clappr"
-  },
   "devDependencies": {
-    "browserify": "^6.2.0",
-    "babelify": "5.0.3",
-    "gulp": "^3.8.6",
-    "gulp-minify-css": "^0.3.6",
-    "lodash.template" : "3.5.1",
-    "gulp-rename": "^1.2.0",
-    "gulp-sass": "^0.7.2",
-    "vinyl-source-stream": "^1.0.0",
-    "yargs": "latest",
+    "babel-core": "^6.1.2",
+    "babel-loader": "^6.0.1",
+    "babel-preset-es2015": "^6.1.2",
+    "clean-webpack-plugin": "^0.1.4",
+    "compass-mixins": "^0.12.7",
+    "css-loader": "^0.22.0",
+    "file-loader": "^0.8.4",
     "glob": "^4.0.4",
-    "mkdirp": "^0.5.0",
-    "express": "^4.6.1",
-    "gulp-util": "latest",
-    "gulp-uglify": "^1.0.1",
-    "gulp-livereload": "^2.1.0",
-    "gulp-streamify": "0.0.5"
+    "html-loader": "^0.3.0",
+    "karma": "^0.13.15",
+    "node-sass": "^3.4.1",
+    "sass-loader": "^3.1.1",
+    "url-loader": "^0.5.6",
+    "webpack": "^1.12.2",
+    "webpack-dev-server": "^1.12.1",
+    "yargs": "latest"
   }
 }
