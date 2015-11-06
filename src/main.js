@@ -1,15 +1,13 @@
-var UICorePlugin = require('Clappr').UICorePlugin
-var JST = require('.././jst')
-var Styler = require('./styler')
-var version = require('../package.json').version
-var Events = Clappr.Events
+import {Events, Styler, UICorePlugin, template} from 'Clappr'
+import pluginHtml from './public/level-selector.html'
+import pluginStyle from './public/style.scss'
 
 class LevelSelector extends UICorePlugin {
 
-  static get version() { return version }
+  static get version() { return VERSION }
 
   get name() { return 'level_selector' }
-  get template() { return JST.level_selector }
+  get template() { return template(pluginHtml) }
 
   get attributes() {
     return {
@@ -26,11 +24,9 @@ class LevelSelector extends UICorePlugin {
   }
 
   constructor(core) {
-    this.core = core
-    if (this.isEnabled()) {
-      this.init()
-    }
     super(core)
+    this.init()
+    this.render()
   }
 
   init() {
@@ -47,11 +43,9 @@ class LevelSelector extends UICorePlugin {
 
   bindEvents() {
     this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED, this.reload)
-    if (this.isEnabled()) {
-      this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_RENDERED, this.render)
-      this.listenTo(this.getPlayback(), Events.PLAYBACK_FRAGMENT_LOADED, this.onFragmentLoaded)
-      this.listenTo(this.getContainer(), Events.CONTAINER_BITRATE, (bitrate) => this.onLevelChanged(bitrate.level))
-    }
+    this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_RENDERED, this.render)
+    this.listenTo(this.getPlayback(), Events.PLAYBACK_FRAGMENT_LOADED, this.onFragmentLoaded)
+    this.listenTo(this.getContainer(), Events.CONTAINER_BITRATE, (bitrate) => this.onLevelChanged(bitrate.level))
   }
 
   unBindEvents() {
@@ -64,8 +58,8 @@ class LevelSelector extends UICorePlugin {
   render() {
     if (this.isEnabled()) {
       this.$el.html(this.template({'levels':this.levels, 'current_level': 0}))
-      var style = Styler.getStyleFor(this.name)
-      this.$el.append(style[0])
+      var style = Styler.getStyleFor(pluginStyle, {baseUrl: this.core.options.baseUrl})
+      this.$el.append(style)
       this.core.mediaControl.$el.find('.media-control-right-panel').append(this.el)
       this.updateText(this.currentLevel)
       return this
