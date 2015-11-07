@@ -67,11 +67,11 @@ class LevelSelector extends UICorePlugin {
   }
 
   isEnabled() {
-    return this.levels && this.core.mediaControl.container.playback.name === 'flashls'
+    return this.levels
   }
 
   onFragmentLoaded() {
-    this.levels = this.getContainer().playback.getLevels()
+    this.levels = this.getContainer().playback.levels
     Clappr.Mediator.off(this.getContainer().playback.cid + ":fragmentloaded")
     this.render()
   }
@@ -121,11 +121,11 @@ class LevelSelector extends UICorePlugin {
   }
 
   getCurrentLevel() {
-    return this.currentLevel = (this.currentLevel || this.getPlayback().getCurrentLevelIndex())
+    return this.currentLevel = (this.currentLevel || this.getPlayback().currentLevel)
   }
 
   setLevel(level) {
-    this.getPlayback().setCurrentLevel(level)
+    this.getPlayback().currentLevel = level
   }
 
   buttonElement() {
