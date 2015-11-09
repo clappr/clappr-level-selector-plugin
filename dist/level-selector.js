@@ -116,7 +116,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }], [{
 	    key: 'version',
 	    get: function get() {
-	      return ("0.0.10");
+	      return ("0.1.0");
 	    }
 	  }]);
 
@@ -151,7 +151,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      this.listenTo(this.core.mediaControl, _Clappr.Events.MEDIACONTROL_CONTAINERCHANGED, this.reload);
 	      this.listenTo(this.core.mediaControl, _Clappr.Events.MEDIACONTROL_RENDERED, this.render);
-	      this.listenTo(this.getPlayback(), _Clappr.Events.PLAYBACK_FRAGMENT_LOADED, this.onFragmentLoaded);
+	      this.listenToOnce(this.getPlayback(), _Clappr.Events.PLAYBACK_FRAGMENT_LOADED, this.onFragmentLoaded);
 	      this.listenTo(this.getContainer(), _Clappr.Events.CONTAINER_BITRATE, function (bitrate) {
 	        return _this2.onLevelChanged(bitrate.level);
 	      });
@@ -161,7 +161,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function unBindEvents() {
 	      this.stopListening(this.core.mediaControl, _Clappr.Events.MEDIACONTROL_CONTAINERCHANGED);
 	      this.stopListening(this.core.mediaControl, _Clappr.Events.MEDIACONTROL_RENDERED);
-	      this.stopListening(this.getPlayback(), _Clappr.Events.PLAYBACK_FRAGMENT_LOADED);
 	      this.stopListening(this.getContainer(), _Clappr.Events.CONTAINER_BITRATE);
 	    }
 	  }, {
@@ -179,13 +178,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'isEnabled',
 	    value: function isEnabled() {
-	      return this.levels && this.core.mediaControl.container.playback.name === 'flashls';
+	      return this.levels;
 	    }
 	  }, {
 	    key: 'onFragmentLoaded',
 	    value: function onFragmentLoaded() {
-	      this.levels = this.getContainer().playback.getLevels();
-	      Clappr.Mediator.off(this.getContainer().playback.cid + ":fragmentloaded");
+	      this.levels = this.getContainer().playback.levels;
 	      this.render();
 	    }
 	  }, {
@@ -194,7 +192,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (level !== undefined) {
 	        this.currentLevel = level;
 	        this.updateText(level);
-	        if (this.selectedIsCurrent(level)) {
+	        if (this.auto_level || this.selectedIsCurrent(level)) {
 	          this.stopAnimation();
 	        }
 	      }
@@ -241,12 +239,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getCurrentLevel',
 	    value: function getCurrentLevel() {
-	      return this.currentLevel = this.currentLevel || this.getPlayback().getCurrentLevelIndex();
+	      return this.currentLevel = this.currentLevel || this.getPlayback().currentLevel;
 	    }
 	  }, {
 	    key: 'setLevel',
 	    value: function setLevel(level) {
-	      this.getPlayback().setCurrentLevel(level);
+	      this.getPlayback().currentLevel = level;
 	    }
 	  }, {
 	    key: 'buttonElement',
