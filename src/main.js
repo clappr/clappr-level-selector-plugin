@@ -44,14 +44,13 @@ class LevelSelector extends UICorePlugin {
   bindEvents() {
     this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED, this.reload)
     this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_RENDERED, this.render)
-    this.listenTo(this.getPlayback(), Events.PLAYBACK_FRAGMENT_LOADED, this.onFragmentLoaded)
+    this.listenToOnce(this.getPlayback(), Events.PLAYBACK_FRAGMENT_LOADED, this.onFragmentLoaded)
     this.listenTo(this.getContainer(), Events.CONTAINER_BITRATE, (bitrate) => this.onLevelChanged(bitrate.level))
   }
 
   unBindEvents() {
     this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED)
     this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_RENDERED)
-    this.stopListening(this.getPlayback(), Events.PLAYBACK_FRAGMENT_LOADED)
     this.stopListening(this.getContainer(), Events.CONTAINER_BITRATE)
   }
 
