@@ -79,7 +79,7 @@ class LevelSelector extends UICorePlugin {
     if (level !== undefined) {
       this.currentLevel = level
       this.updateText(level)
-      if (this.selectedIsCurrent(level)) {
+      if (this.auto_level || this.selectedIsCurrent(level)) {
         this.stopAnimation()
       }
     }
