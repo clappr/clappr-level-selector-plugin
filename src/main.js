@@ -71,7 +71,6 @@ class LevelSelector extends UICorePlugin {
 
   onFragmentLoaded() {
     this.levels = this.getContainer().playback.levels
-    Clappr.Mediator.off(this.getContainer().playback.cid + ":fragmentloaded")
     this.render()
   }
 
