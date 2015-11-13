@@ -167,7 +167,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'render',
 	    value: function render() {
 	      if (this.isEnabled()) {
-	        this.$el.html(this.template({ 'levels': this.levels, 'current_level': 0 }));
+	        this.$el.html(this.template({ 'levels': this.levels, 'current_level': 0, 'title': this.getTitle() }));
 	        var style = _Clappr.Styler.getStyleFor(_style2.default, { baseUrl: this.core.options.baseUrl });
 	        this.$el.append(style);
 	        this.core.mediaControl.$el.find('.media-control-right-panel').append(this.el);
@@ -184,6 +184,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'onFragmentLoaded',
 	    value: function onFragmentLoaded() {
 	      this.levels = this.getContainer().playback.levels;
+
+	      for (var i in this.levels) {
+	        this.levels[i].label = this.getDisplayText(this.levels[i].bitrate);
+	      }
+
 	      this.render();
 	    }
 	  }, {
@@ -269,14 +274,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this.selected_level === currentLevel;
 	    }
 	  }, {
+	    key: 'getTitle',
+	    value: function getTitle() {
+	      var pluginOptions = this.core.options.levelSelectorConfig || {};
+	      return pluginOptions.title;
+	    }
+	  }, {
+	    key: 'getDisplayText',
+	    value: function getDisplayText(bitrate) {
+	      var bitrate_kbps = Math.floor(bitrate / 1000);
+	      var pluginOptions = this.core.options.levelSelectorConfig || {};
+	      var levels = pluginOptions.labels || {};
+
+	      return levels[bitrate_kbps] || bitrate_kbps + 'kbps';
+	    }
+	  }, {
 	    key: 'updateText',
 	    value: function updateText(level) {
 	      if (level === undefined || level === -1) {
 	        level = this.getCurrentLevel();
 	      }
 	      if (this.levels[level]) {
-	        var display_text = Math.floor(this.levels[level].bitrate / 1000);
-	        display_text += 'kbps';
+	        var display_text = this.levels[level].label;
+
 	        if (this.auto_level) {
 	          display_text = 'AUTO (' + display_text + ')';
 	        }
@@ -300,7 +320,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports) {
 
-	module.exports = "<button data-level-selector-button>Auto</button><ul><li><a href=# data-level-selector-select=-1>AUTO</a></li><% for (var i = 0; i < levels.length; i++) { %><li><a href=# data-level-selector-select=\"<%= i %>\"><%= Math.floor(levels[i].bitrate / 1000) %>kbps</a></li><% }; %></ul>";
+	module.exports = "<button data-level-selector-button>Auto</button><ul><% if (title) { %><li data-title><%= title %></li><% }; %><li><a href=# data-level-selector-select=-1>AUTO</a></li><% for (var i = 0; i < levels.length; i++) { %><li><a href=# data-level-selector-select=\"<%= i %>\"><%= levels[i].label %></a></li><% }; %></ul>";
 
 /***/ },
 /* 4 */
@@ -311,7 +331,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 	// module
-	exports.push([module.id, ".level_selector[data-level-selector] {\n  float: right;\n  margin-top: 5px;\n  position: relative; }\n  .level_selector[data-level-selector] button {\n    background-color: transparent;\n    color: #fff;\n    font-family: Roboto,\"Open Sans\",Arial,sans-serif;\n    -webkit-font-smoothing: antialiased;\n    border: none;\n    font-size: 10px; }\n    .level_selector[data-level-selector] button:hover {\n      color: #c9c9c9; }\n    .level_selector[data-level-selector] button.changing {\n      -webkit-animation: pulse 0.5s infinite alternate; }\n  .level_selector[data-level-selector] > ul {\n    list-style-type: none;\n    position: absolute;\n    bottom: 25px;\n    border: 1px solid black;\n    display: none;\n    background-color: #e6e6e6; }\n  .level_selector[data-level-selector] li a {\n    color: #444;\n    padding: 2px 10px;\n    display: block;\n    text-decoration: none;\n    font-size: 10px; }\n  .level_selector[data-level-selector] li:hover {\n    background-color: #555;\n    color: white; }\n    .level_selector[data-level-selector] li:hover a {\n      color: white;\n      text-decoration: none; }\n\n@-webkit-keyframes pulse {\n  0% {\n    color: #fff; }\n  50% {\n    color: #ff0101; }\n  100% {\n    color: #B80000; } }\n", ""]);
+	exports.push([module.id, ".level_selector[data-level-selector] {\n  float: right;\n  margin-top: 5px;\n  position: relative; }\n  .level_selector[data-level-selector] button {\n    background-color: transparent;\n    color: #fff;\n    font-family: Roboto,\"Open Sans\",Arial,sans-serif;\n    -webkit-font-smoothing: antialiased;\n    border: none;\n    font-size: 10px; }\n    .level_selector[data-level-selector] button:hover {\n      color: #c9c9c9; }\n    .level_selector[data-level-selector] button.changing {\n      -webkit-animation: pulse 0.5s infinite alternate; }\n  .level_selector[data-level-selector] > ul {\n    list-style-type: none;\n    position: absolute;\n    bottom: 25px;\n    border: 1px solid black;\n    display: none;\n    background-color: #e6e6e6; }\n  .level_selector[data-level-selector] li {\n    font-size: 10px; }\n    .level_selector[data-level-selector] li[data-title] {\n      background-color: #c3c2c2;\n      padding: 5px; }\n    .level_selector[data-level-selector] li a {\n      color: #444;\n      padding: 2px 10px;\n      display: block;\n      text-decoration: none; }\n      .level_selector[data-level-selector] li a:hover {\n        background-color: #555;\n        color: white; }\n        .level_selector[data-level-selector] li a:hover a {\n          color: white;\n          text-decoration: none; }\n\n@-webkit-keyframes pulse {\n  0% {\n    color: #fff; }\n  50% {\n    color: #ff0101; }\n  100% {\n    color: #B80000; } }\n", ""]);
 
 	// exports
 
