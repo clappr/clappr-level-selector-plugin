@@ -24,6 +24,25 @@ var player = new Clappr.Player({
 });
 ```
 
+You can also customize the labels and title:
+
+```javascript
+var player = new Clappr.Player({
+  source: "http://your.video/here.m3u8",
+  plugins: {
+    'core': [LevelSelector]
+  },
+  levelSelectorConfig: {
+    title: 'Quality',
+    labels: {
+        500: 'High', // 500kbps
+        240: 'Med', // 240kbps
+        120: 'Low', // 120kbps
+    }
+  },
+});
+```
+
 *Note: There is a minified version served through CDNs too:*
 ```html
 <script type="text/javascript"
