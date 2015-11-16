@@ -56,7 +56,7 @@ class LevelSelector extends UICorePlugin {
 
   render() {
     if (this.isEnabled()) {
-      this.$el.html(this.template({'levels':this.levels, 'current_level': 0}))
+      this.$el.html(this.template({'levels':this.levels, 'current_level': 0, 'title': this.getTitle()}))
       var style = Styler.getStyleFor(pluginStyle, {baseUrl: this.core.options.baseUrl})
       this.$el.append(style)
       this.core.mediaControl.$el.find('.media-control-right-panel').append(this.el)
@@ -71,6 +71,11 @@ class LevelSelector extends UICorePlugin {
 
   onFragmentLoaded() {
     this.levels = this.getContainer().playback.levels
+
+    for (var i in this.levels) {
+      this.levels[i].label = this.getDisplayText(this.levels[i].bitrate)
+    }
+
     this.render()
   }
 
@@ -142,13 +147,26 @@ class LevelSelector extends UICorePlugin {
     return (this.selected_level === currentLevel)
   }
 
+  getTitle() {
+    var pluginOptions = this.core.options.levelSelectorConfig || {}
+    return pluginOptions.title
+  }
+
+  getDisplayText(bitrate) {
+    var bitrate_kbps = Math.floor(bitrate / 1000)
+    var pluginOptions = this.core.options.levelSelectorConfig || {}
+    var levels = pluginOptions.labels || {}
+
+    return levels[bitrate_kbps] || bitrate_kbps + 'kbps'
+  }
+
   updateText(level) {
     if (level === undefined || level === -1) {
       level = this.getCurrentLevel()
     }
     if (this.levels[level]) {
-      var display_text = Math.floor(this.levels[level].bitrate / 1000)
-      display_text += 'kbps'
+      var display_text = this.levels[level].label
+
       if (this.auto_level) {
         display_text = 'AUTO (' + display_text + ')'
       }
