@@ -73,7 +73,10 @@ class LevelSelector extends UICorePlugin {
     this.levels = this.getContainer().playback.levels
 
     for (var i in this.levels) {
-      this.levels[i].label = this.getDisplayText(this.levels[i].bitrate)
+      var bitrate = this.levels[i].bitrate
+      if (bitrate) {
+        this.levels[i].label = this.getDisplayText(bitrate)
+      }
     }
 
     this.render()
