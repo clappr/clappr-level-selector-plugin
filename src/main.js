@@ -2,7 +2,9 @@ import {Events, Styler, UICorePlugin, template} from 'Clappr'
 import pluginHtml from './public/level-selector.html'
 import pluginStyle from './public/style.scss'
 
-class LevelSelector extends UICorePlugin {
+const AUTO = -1
+
+export default class LevelSelector extends UICorePlugin {
 
   static get version() { return VERSION }
 
@@ -30,9 +32,28 @@ class LevelSelector extends UICorePlugin {
   }
 
   init() {
-    this.levels = {}
-    this.auto_level = true
-    this.selected_level = -1
+    this.levels = []
+    this.selectedLevelId = AUTO
+    this.options = this.core.options
+  }
+
+  bindEvents() {
+    this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED, this.reload)
+    this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_RENDERED, this.render)
+    this.listenTo(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVELS_AVAILABLE, this.fillLevels)
+    this.listenTo(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVEL_SWITCH_START, this.startAnimation)
+    this.listenTo(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVEL_SWITCH_END, this.stopAnimation)
+
+    var playbackLevelsAvaialbeWasTriggered = this.core.getCurrentPlayback().levels && this.core.getCurrentPlayback().levels.length > 0
+    playbackLevelsAvaialbeWasTriggered && this.fillLevels(this.core.getCurrentPlayback().levels)
+  }
+
+  unBindEvents() {
+    this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED)
+    this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_RENDERED)
+    this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVELS_AVAILABLE)
+    this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVEL_SWITCH_START)
+    this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVEL_SWITCH_END)
   }
 
   reload() {
@@ -41,141 +62,77 @@ class LevelSelector extends UICorePlugin {
     this.bindEvents()
   }
 
-  bindEvents() {
-    this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED, this.reload)
-    this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_RENDERED, this.render)
-    this.listenToOnce(this.getPlayback(), Events.PLAYBACK_FRAGMENT_LOADED, this.onFragmentLoaded)
-    this.listenTo(this.getContainer(), Events.CONTAINER_BITRATE, (bitrate) => this.onLevelChanged(bitrate.level))
-  }
+  shouldRender() {
+    if (!this.core.getCurrentPlayback()) return false
 
-  unBindEvents() {
-    this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED)
-    this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_RENDERED)
-    this.stopListening(this.getContainer(), Events.CONTAINER_BITRATE)
+    var respondsToCurrentLevel = !!this.core.getCurrentPlayback().currentLevel
+    var hasLevels = !!(this.core.getCurrentPlayback().levels && this.core.getCurrentPlayback().levels.length > 0)
+    return respondsToCurrentLevel && hasLevels
   }
 
   render() {
-    if (this.isEnabled()) {
-      this.$el.html(this.template({'levels':this.levels, 'current_level': 0, 'title': this.getTitle()}))
-      var style = Styler.getStyleFor(pluginStyle, {baseUrl: this.core.options.baseUrl})
+    if (this.shouldRender()) {
+      var style = Styler.getStyleFor(pluginStyle, {baseUrl: this.options.baseUrl})
+
+      this.$el.html(this.template({'levels':this.levels, 'title': this.getTitle()}))
       this.$el.append(style)
-      this.core.mediaControl.$el.find('.media-control-right-panel').append(this.el)
-      this.updateText(this.currentLevel)
-      return this
+      this.core.mediaControl.$('.media-control-right-panel').append(this.el)
+      this.updateText(this.selectedLevelId)
     }
+    return this
   }
 
-  isEnabled() {
-    return this.levels
-  }
-
-  onFragmentLoaded() {
-    this.levels = this.getContainer().playback.levels
-
-    for (var i in this.levels) {
-      var bitrate = this.levels[i].bitrate
-      if (bitrate) {
-        this.levels[i].label = this.getDisplayText(bitrate)
-      }
-    }
-
+  fillLevels(levels) {
+    this.levels = levels
+    this.configureLevelsLabels()
     this.render()
   }
 
-  onLevelChanged(level) {
-    if (level !== undefined) {
-      this.currentLevel = level
-      this.updateText(level)
-      if (this.auto_level || this.selectedIsCurrent(level)) {
-        this.stopAnimation()
-      }
+  configureLevelsLabels() {
+    if (this.options.levelSelectorConfig === undefined) return
+
+    for(var levelId in (this.options.levelSelectorConfig.labels || {})){
+      var thereIsLevel = !!this.findLevelBy(levelId)
+      thereIsLevel && this.changeLevelLabelBy(levelId, this.options.levelSelectorConfig.labels[labelId])
     }
   }
 
+  findLevelBy(id) {
+    var foundLevel
+    this.levels.forEach((level) => { if (level.id === id) {foundLevel = level} })
+    return foundLevel
+  }
+
+  changeLevelLabelBy(id, newLabel) {
+    this.levels.forEach((level, index) => {
+      if (level.id === id) {
+        this.levels[index] = newLabel
+      }
+    })
+  }
+
   onLevelSelect(event) {
-    this.selected_level = parseInt(event.target.dataset.levelSelectorSelect, 10)
-    this.auto_level = (this.selected_level === -1)
-    this.setLevel(this.selected_level)
+    this.selectedLevelId = parseInt(event.target.dataset.levelSelectorSelect, 10)
+    this.core.getCurrentPlayback().currentLevel = this.selectedLevelId
+
     this.toggleContextMenu()
-    if (this.auto_level || this.selectedIsCurrent()) {
-      this.updateText(this.selected_level)
-    } else {
-      this.startAnimation()
-      this.updateText(this.selected_level)
-    }
+    this.render()
+
     event.stopPropagation()
     return false
   }
 
-  onShowLevelSelectMenu(event) {
-    this.toggleContextMenu()
-  }
+  onShowLevelSelectMenu(event) { this.toggleContextMenu() }
 
-  toggleContextMenu() {
-    this.$el.find('.level_selector ul').toggle()
-  }
+  toggleContextMenu() { this.$('.level_selector ul').toggle() }
 
-  getContainer() {
-    return this.core.getCurrentContainer()
-  }
+  buttonElement() { return this.$('.level_selector button') }
 
-  getPlayback() {
-    if (this.getContainer()) {
-      return this.getContainer().playback
-    }
-    return null
-  }
+  startAnimation() { this.buttonElement().addClass('changing') }
 
-  getCurrentLevel() {
-    return this.currentLevel = (this.currentLevel || this.getPlayback().currentLevel)
-  }
+  stopAnimation() { this.buttonElement().removeClass('changing') }
 
-  setLevel(level) {
-    this.getPlayback().currentLevel = level
-  }
+  getTitle() { return (this.options.levelSelectorConfig || {}).title }
 
-  buttonElement() {
-    return this.$el.find('.level_selector button')
-  }
-
-  startAnimation() {
-    this.buttonElement().addClass('changing')
-  }
-
-  stopAnimation() {
-    this.buttonElement().removeClass('changing')
-  }
-
-  selectedIsCurrent(currentLevel = this.getCurrentLevel()) {
-    return (this.selected_level === currentLevel)
-  }
-
-  getTitle() {
-    var pluginOptions = this.core.options.levelSelectorConfig || {}
-    return pluginOptions.title
-  }
-
-  getDisplayText(bitrate) {
-    var bitrate_kbps = Math.floor(bitrate / 1000)
-    var pluginOptions = this.core.options.levelSelectorConfig || {}
-    var levels = pluginOptions.labels || {}
-
-    return levels[bitrate_kbps] || bitrate_kbps + 'kbps'
-  }
-
-  updateText(level) {
-    if (level === undefined || level === -1) {
-      level = this.getCurrentLevel()
-    }
-    if (this.levels[level]) {
-      var display_text = this.levels[level].label
-
-      if (this.auto_level) {
-        display_text = 'AUTO (' + display_text + ')'
-      }
-      this.buttonElement().text(display_text)
-    }
-  }
+  updateText(level) { this.buttonElement().text((level === AUTO)? 'AUTO' : this.findLevelBy(level).label) }
 }
-
-module.exports = window.LevelSelector = LevelSelector
