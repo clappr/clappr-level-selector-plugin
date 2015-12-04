@@ -34,7 +34,6 @@ export default class LevelSelector extends UICorePlugin {
   init() {
     this.levels = []
     this.selectedLevelId = AUTO
-    this.options = this.core.options
   }
 
   bindEvents() {
@@ -72,7 +71,7 @@ export default class LevelSelector extends UICorePlugin {
 
   render() {
     if (this.shouldRender()) {
-      var style = Styler.getStyleFor(pluginStyle, {baseUrl: this.options.baseUrl})
+      var style = Styler.getStyleFor(pluginStyle, {baseUrl: this.core.options.baseUrl})
 
       this.$el.html(this.template({'levels':this.levels, 'title': this.getTitle()}))
       this.$el.append(style)
@@ -89,11 +88,11 @@ export default class LevelSelector extends UICorePlugin {
   }
 
   configureLevelsLabels() {
-    if (this.options.levelSelectorConfig === undefined) return
+    if (this.core.options.levelSelectorConfig === undefined) return
 
-    for(var levelId in (this.options.levelSelectorConfig.labels || {})){
+    for(var levelId in (this.core.options.levelSelectorConfig.labels || {})){
       var thereIsLevel = !!this.findLevelBy(levelId)
-      thereIsLevel && this.changeLevelLabelBy(levelId, this.options.levelSelectorConfig.labels[labelId])
+      thereIsLevel && this.changeLevelLabelBy(levelId, this.core.options.levelSelectorConfig.labels[labelId])
     }
   }
 
@@ -132,7 +131,7 @@ export default class LevelSelector extends UICorePlugin {
 
   stopAnimation() { this.buttonElement().removeClass('changing') }
 
-  getTitle() { return (this.options.levelSelectorConfig || {}).title }
+  getTitle() { return (this.core.options.levelSelectorConfig || {}).title }
 
   updateText(level) { this.buttonElement().text((level === AUTO)? 'AUTO' : this.findLevelBy(level).label) }
 }
