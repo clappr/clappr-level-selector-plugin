@@ -48,3 +48,13 @@ var player = new Clappr.Player({
 <script type="text/javascript"
         src="//cdn.jsdelivr.net/clappr.level-selector/latest/level-selector.min.js"></script>
 ```
+
+## Compatibility
+
+All the playbacks that follow these rules:
+
+* must trigger `PLAYBACK_LEVELS_AVAILABLE` with an ordered array of levels `[{id: 3, label: '500Kbps'}, {id: 4, label: '600Kpbs'}]`
+* to have a property `levels`, initialized with `[]` and then after filled with the proper levels
+* to have a property `currentLevel` (set/get), the level switch will happen when id (currentLevel) is changed  (`playback.currentLevel = id`)
+* optionally, trigger events: `PLAYBACK_LEVEL_SWITCH_START` and `PLAYBACK_LEVEL_SWITCH_END`
+* `id=-1` will be always the `Auto` level
