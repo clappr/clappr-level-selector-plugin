@@ -35,9 +35,9 @@ var player = new Clappr.Player({
   levelSelectorConfig: {
     title: 'Quality',
     labels: {
-        500: 'High', // 500kbps
-        240: 'Med', // 240kbps
-        120: 'Low', // 120kbps
+        2: 'High', // 500kbps
+        1: 'Med', // 240kbps
+        0: 'Low', // 120kbps
     }
   },
 });
