@@ -90,7 +90,7 @@ export default class LevelSelector extends UICorePlugin {
   configureLevelsLabels() {
     if (this.core.options.levelSelectorConfig === undefined) return
 
-    for(var levelId in (this.core.options.levelSelectorConfig.labels || {})){
+    for (var levelId in (this.core.options.levelSelectorConfig.labels || {})) {
       levelId = parseInt(levelId, 10)
       var thereIsLevel = !!this.findLevelBy(levelId)
       thereIsLevel && this.changeLevelLabelBy(levelId, this.core.options.levelSelectorConfig.labels[levelId])
