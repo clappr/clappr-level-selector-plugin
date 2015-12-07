@@ -64,7 +64,7 @@ export default class LevelSelector extends UICorePlugin {
   shouldRender() {
     if (!this.core.getCurrentPlayback()) return false
 
-    var respondsToCurrentLevel = !!this.core.getCurrentPlayback().currentLevel
+    var respondsToCurrentLevel = this.core.getCurrentPlayback().currentLevel !== undefined
     var hasLevels = !!(this.core.getCurrentPlayback().levels && this.core.getCurrentPlayback().levels.length > 0)
     return respondsToCurrentLevel && hasLevels
   }
