@@ -64,7 +64,7 @@ export default class LevelSelector extends UICorePlugin {
   shouldRender() {
     if (!this.core.getCurrentPlayback()) return false
 
-    var respondsToCurrentLevel = !!this.core.getCurrentPlayback().currentLevel
+    var respondsToCurrentLevel = this.core.getCurrentPlayback().currentLevel !== undefined
     var hasLevels = !!(this.core.getCurrentPlayback().levels && this.core.getCurrentPlayback().levels.length > 0)
     return respondsToCurrentLevel && hasLevels
   }
@@ -91,8 +91,9 @@ export default class LevelSelector extends UICorePlugin {
     if (this.core.options.levelSelectorConfig === undefined) return
 
     for(var levelId in (this.core.options.levelSelectorConfig.labels || {})){
+      levelId = parseInt(levelId, 10)
       var thereIsLevel = !!this.findLevelBy(levelId)
-      thereIsLevel && this.changeLevelLabelBy(levelId, this.core.options.levelSelectorConfig.labels[labelId])
+      thereIsLevel && this.changeLevelLabelBy(levelId, this.core.options.levelSelectorConfig.labels[levelId])
     }
   }
 
@@ -105,7 +106,7 @@ export default class LevelSelector extends UICorePlugin {
   changeLevelLabelBy(id, newLabel) {
     this.levels.forEach((level, index) => {
       if (level.id === id) {
-        this.levels[index] = newLabel
+        this.levels[index].label = newLabel
       }
     })
   }
