@@ -109,7 +109,7 @@ export default class LevelSelector extends UICorePlugin {
     this.core.getCurrentPlayback().currentLevel = this.selectedLevelId
 
     this.toggleContextMenu()
-    this.render()
+    this.updateText(this.selectedLevelId)
 
     event.stopPropagation()
     return false
