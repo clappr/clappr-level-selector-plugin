@@ -25,26 +25,17 @@ export default class LevelSelector extends UICorePlugin {
     }
   }
 
-  constructor(core) {
-    super(core)
-    this.init()
-    this.render()
-  }
-
-  init() {
-    this.levels = []
-    this.selectedLevelId = AUTO
-  }
-
   bindEvents() {
+    var currentPlayback = this.core.getCurrentPlayback()
+
     this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED, this.reload)
     this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_RENDERED, this.render)
-    this.listenTo(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVELS_AVAILABLE, this.fillLevels)
-    this.listenTo(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVEL_SWITCH_START, this.startAnimation)
-    this.listenTo(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVEL_SWITCH_END, this.stopAnimation)
+    this.listenTo(currentPlayback, Events.PLAYBACK_LEVELS_AVAILABLE, this.fillLevels)
+    this.listenTo(currentPlayback, Events.PLAYBACK_LEVEL_SWITCH_START, this.startAnimation)
+    this.listenTo(currentPlayback, Events.PLAYBACK_LEVEL_SWITCH_END, this.stopAnimation)
 
-    var playbackLevelsAvaialbeWasTriggered = this.core.getCurrentPlayback().levels && this.core.getCurrentPlayback().levels.length > 0
-    playbackLevelsAvaialbeWasTriggered && this.fillLevels(this.core.getCurrentPlayback().levels)
+    var playbackLevelsAvaialbeWasTriggered = currentPlayback.levels && currentPlayback.levels.length > 0
+    playbackLevelsAvaialbeWasTriggered && this.fillLevels(currentPlayback.levels)
   }
 
   unBindEvents() {
@@ -57,15 +48,16 @@ export default class LevelSelector extends UICorePlugin {
 
   reload() {
     this.unBindEvents()
-    this.init()
     this.bindEvents()
   }
 
   shouldRender() {
-    if (!this.core.getCurrentPlayback()) return false
+    var currentPlayback = this.core.getCurrentPlayback()
+    if (!currentPlayback) return false
 
-    var respondsToCurrentLevel = this.core.getCurrentPlayback().currentLevel !== undefined
-    var hasLevels = !!(this.core.getCurrentPlayback().levels && this.core.getCurrentPlayback().levels.length > 0)
+    var respondsToCurrentLevel = currentPlayback.currentLevel !== undefined
+    var hasLevels = !!(currentPlayback.levels && currentPlayback.levels.length > 0)
+
     return respondsToCurrentLevel && hasLevels
   }
 
@@ -81,7 +73,8 @@ export default class LevelSelector extends UICorePlugin {
     return this
   }
 
-  fillLevels(levels) {
+  fillLevels(levels, initialLevel = AUTO) {
+    this.selectedLevelId = initialLevel
     this.levels = levels
     this.configureLevelsLabels()
     this.render()
