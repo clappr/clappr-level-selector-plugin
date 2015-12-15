@@ -31,8 +31,8 @@ export default class LevelSelector extends UICorePlugin {
     this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED, this.reload)
     this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_RENDERED, this.render)
     this.listenTo(currentPlayback, Events.PLAYBACK_LEVELS_AVAILABLE, this.fillLevels)
-    this.listenTo(currentPlayback, Events.PLAYBACK_LEVEL_SWITCH_START, this.startAnimation)
-    this.listenTo(currentPlayback, Events.PLAYBACK_LEVEL_SWITCH_END, this.stopAnimation)
+    this.listenTo(currentPlayback, Events.PLAYBACK_LEVEL_SWITCH_START, this.startLevelSwitch)
+    this.listenTo(currentPlayback, Events.PLAYBACK_LEVEL_SWITCH_END, this.stopLevelSwitch)
 
     var playbackLevelsAvaialbeWasTriggered = currentPlayback.levels && currentPlayback.levels.length > 0
     playbackLevelsAvaialbeWasTriggered && this.fillLevels(currentPlayback.levels)
@@ -121,11 +121,22 @@ export default class LevelSelector extends UICorePlugin {
 
   buttonElement() { return this.$('.level_selector button') }
 
-  startAnimation() { this.buttonElement().addClass('changing') }
-
-  stopAnimation() { this.buttonElement().removeClass('changing') }
-
   getTitle() { return (this.core.options.levelSelectorConfig || {}).title }
 
-  updateText(level) { this.buttonElement().text((level === AUTO)? 'AUTO' : this.findLevelBy(level).label) }
+  startLevelSwitch() { this.buttonElement().addClass('changing') }
+
+  stopLevelSwitch() {
+    this.buttonElement().removeClass('changing')
+    this.updateText(this.selectedLevelId)
+  }
+
+  updateText(level) {
+    if (level === AUTO) {
+      var playbackLevel = this.core.getCurrentPlayback().currentLevel;
+      this.buttonElement().text('AUTO (' + this.findLevelBy(playbackLevel).label + ')')
+    }
+    else {
+      this.buttonElement().text(this.findLevelBy(level).label)
+    }
+  }
 }
