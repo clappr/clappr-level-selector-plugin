@@ -26,24 +26,29 @@ export default class LevelSelector extends UICorePlugin {
   }
 
   bindEvents() {
-    var currentPlayback = this.core.getCurrentPlayback()
-
+    this.listenTo(this.core, Events.CORE_READY, this.bindPlaybackEvents)
     this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED, this.reload)
     this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_RENDERED, this.render)
-    this.listenTo(currentPlayback, Events.PLAYBACK_LEVELS_AVAILABLE, this.fillLevels)
-    this.listenTo(currentPlayback, Events.PLAYBACK_LEVEL_SWITCH_START, this.startLevelSwitch)
-    this.listenTo(currentPlayback, Events.PLAYBACK_LEVEL_SWITCH_END, this.stopLevelSwitch)
-
-    var playbackLevelsAvaialbeWasTriggered = currentPlayback.levels && currentPlayback.levels.length > 0
-    playbackLevelsAvaialbeWasTriggered && this.fillLevels(currentPlayback.levels)
   }
 
   unBindEvents() {
+    this.stopListening(this.core, Events.CORE_READY)
     this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED)
     this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_RENDERED)
     this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVELS_AVAILABLE)
     this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVEL_SWITCH_START)
     this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVEL_SWITCH_END)
+  }
+
+  bindPlaybackEvents() {
+      var currentPlayback = this.core.getCurrentPlayback()
+
+      this.listenTo(currentPlayback, Events.PLAYBACK_LEVELS_AVAILABLE, this.fillLevels)
+      this.listenTo(currentPlayback, Events.PLAYBACK_LEVEL_SWITCH_START, this.startLevelSwitch)
+      this.listenTo(currentPlayback, Events.PLAYBACK_LEVEL_SWITCH_END, this.stopLevelSwitch)
+
+      var playbackLevelsAvaialbeWasTriggered = currentPlayback.levels && currentPlayback.levels.length > 0
+      playbackLevelsAvaialbeWasTriggered && this.fillLevels(currentPlayback.levels)
   }
 
   reload() {
@@ -52,6 +57,8 @@ export default class LevelSelector extends UICorePlugin {
   }
 
   shouldRender() {
+    if (!this.core.getCurrentContainer()) return false
+
     var currentPlayback = this.core.getCurrentPlayback()
     if (!currentPlayback) return false
 
