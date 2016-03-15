@@ -153,7 +153,7 @@ export default class LevelSelector extends UICorePlugin {
   }
 
   updateText(level) {
-    if (level === AUTO) {
+    if (level === AUTO && !this.providedList) {
       var playbackLevel = this.core.getCurrentPlayback().currentLevel;
       this.buttonElement().text((playbackLevel === AUTO) ? 'AUTO' : 'AUTO (' + this.findLevelBy(playbackLevel).label + ')')
     }
