@@ -31,24 +31,34 @@ export default class LevelSelector extends UICorePlugin {
     this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_RENDERED, this.render)
   }
 
+  get providedList() {
+    var config = this.core.options.levelSelectorConfig
+    return config && config.levels
+  }
+
   unBindEvents() {
     this.stopListening(this.core, Events.CORE_READY)
     this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED)
     this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_RENDERED)
-    this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVELS_AVAILABLE)
-    this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVEL_SWITCH_START)
-    this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVEL_SWITCH_END)
+    if (!this.providedList) {
+      this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVELS_AVAILABLE)
+      this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVEL_SWITCH_START)
+      this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVEL_SWITCH_END)
+    }
   }
 
   bindPlaybackEvents() {
-      var currentPlayback = this.core.getCurrentPlayback()
+      if (this.providedList) {
+        this.fillLevels(this.providedList)
+      } else {
+        var currentPlayback = this.core.getCurrentPlayback()
+        this.listenTo(currentPlayback, Events.PLAYBACK_LEVELS_AVAILABLE, this.fillLevels)
+        this.listenTo(currentPlayback, Events.PLAYBACK_LEVEL_SWITCH_START, this.startLevelSwitch)
+        this.listenTo(currentPlayback, Events.PLAYBACK_LEVEL_SWITCH_END, this.stopLevelSwitch)
 
-      this.listenTo(currentPlayback, Events.PLAYBACK_LEVELS_AVAILABLE, this.fillLevels)
-      this.listenTo(currentPlayback, Events.PLAYBACK_LEVEL_SWITCH_START, this.startLevelSwitch)
-      this.listenTo(currentPlayback, Events.PLAYBACK_LEVEL_SWITCH_END, this.stopLevelSwitch)
-
-      var playbackLevelsAvaialbeWasTriggered = currentPlayback.levels && currentPlayback.levels.length > 0
-      playbackLevelsAvaialbeWasTriggered && this.fillLevels(currentPlayback.levels)
+        var playbackLevelsAvaialbeWasTriggered = currentPlayback.levels && currentPlayback.levels.length > 0
+        playbackLevelsAvaialbeWasTriggered && this.fillLevels(currentPlayback.levels)
+      }
   }
 
   reload() {
@@ -64,8 +74,9 @@ export default class LevelSelector extends UICorePlugin {
 
     var respondsToCurrentLevel = currentPlayback.currentLevel !== undefined
     var hasLevels = !!(this.levels && this.levels.length > 0)
+    var hasProvidedLevels = !!(this.providedList && this.providedList.length > 0)
 
-    return respondsToCurrentLevel && hasLevels
+    return (respondsToCurrentLevel && hasLevels) || hasProvidedLevels
   }
 
   render() {
@@ -75,7 +86,7 @@ export default class LevelSelector extends UICorePlugin {
       this.$el.html(this.template({'levels':this.levels, 'title': this.getTitle()}))
       this.$el.append(style)
       this.core.mediaControl.$('.media-control-right-panel').append(this.el)
-      this.updateText(this.selectedLevelId)
+      this.updateText(this.selectedLevelId || AUTO)
     }
     return this
   }
@@ -113,7 +124,11 @@ export default class LevelSelector extends UICorePlugin {
 
   onLevelSelect(event) {
     this.selectedLevelId = parseInt(event.target.dataset.levelSelectorSelect, 10)
-    this.core.getCurrentPlayback().currentLevel = this.selectedLevelId
+    if (this.providedList) {
+      this.core.load(this.findLevelBy(this.selectedLevelId).src, undefined, {initialSeek: this.core.getCurrentContainer().getCurrentTime()})
+    } else {
+      this.core.getCurrentPlayback().currentLevel = this.selectedLevelId
+    }
 
     this.toggleContextMenu()
     this.updateText(this.selectedLevelId)
