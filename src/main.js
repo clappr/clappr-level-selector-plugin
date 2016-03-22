@@ -46,6 +46,7 @@ export default class LevelSelector extends UICorePlugin {
       this.listenTo(currentPlayback, Events.PLAYBACK_LEVELS_AVAILABLE, this.fillLevels)
       this.listenTo(currentPlayback, Events.PLAYBACK_LEVEL_SWITCH_START, this.startLevelSwitch)
       this.listenTo(currentPlayback, Events.PLAYBACK_LEVEL_SWITCH_END, this.stopLevelSwitch)
+      this.listenTo(currentPlayback, Events.PLAYBACK_BITRATE, this.updateCurrentLevel)
 
       var playbackLevelsAvaialbeWasTriggered = currentPlayback.levels && currentPlayback.levels.length > 0
       playbackLevelsAvaialbeWasTriggered && this.fillLevels(currentPlayback.levels)
@@ -54,6 +55,7 @@ export default class LevelSelector extends UICorePlugin {
   reload() {
     this.unBindEvents()
     this.bindEvents()
+    this.bindPlaybackEvents()
   }
 
   shouldRender() {
@@ -76,12 +78,13 @@ export default class LevelSelector extends UICorePlugin {
       this.$el.append(style)
       this.core.mediaControl.$('.media-control-right-panel').append(this.el)
       this.updateText(this.selectedLevelId)
+      this.highlightCurrentLevel()
     }
     return this
   }
 
   fillLevels(levels, initialLevel = AUTO) {
-    this.selectedLevelId = initialLevel
+    if (this.selectedLevelId === undefined) this.selectedLevelId = initialLevel
     this.levels = levels
     this.configureLevelsLabels()
     this.render()
@@ -128,6 +131,8 @@ export default class LevelSelector extends UICorePlugin {
 
   buttonElement() { return this.$('.level_selector button') }
 
+  levelElement(id) { return this.$('.level_selector ul a'+(!isNaN(id) ? '[data-level-selector-select="'+id+'"]' : '')).parent() }
+
   getTitle() { return (this.core.options.levelSelectorConfig || {}).title }
 
   startLevelSwitch() { this.buttonElement().addClass('changing') }
@@ -139,11 +144,19 @@ export default class LevelSelector extends UICorePlugin {
 
   updateText(level) {
     if (level === AUTO) {
-      var playbackLevel = this.core.getCurrentPlayback().currentLevel;
-      this.buttonElement().text((playbackLevel === AUTO) ? 'AUTO' : 'AUTO (' + this.findLevelBy(playbackLevel).label + ')')
+      this.buttonElement().text(this.currentLevel ? 'AUTO (' + this.currentLevel.label + ')' : 'AUTO')
     }
     else {
       this.buttonElement().text(this.findLevelBy(level).label)
     }
+  }
+  updateCurrentLevel(info) {
+    var level = this.findLevelBy(info.level)
+    this.currentLevel = level ? level : null
+    this.highlightCurrentLevel()
+  }
+  highlightCurrentLevel() {
+    this.levelElement().removeClass('current')
+    this.currentLevel && this.levelElement(this.currentLevel.id).addClass('current')
   }
 }
