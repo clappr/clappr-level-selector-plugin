@@ -118,6 +118,7 @@ export default class LevelSelector extends UICorePlugin {
 
   onLevelSelect(event) {
     this.selectedLevelId = parseInt(event.target.dataset.levelSelectorSelect, 10)
+    if (this.core.getCurrentPlayback().currentLevel == this.selectedLevelId) return false;
     this.core.getCurrentPlayback().currentLevel = this.selectedLevelId
 
     this.toggleContextMenu()
