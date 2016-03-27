@@ -29,12 +29,14 @@ export default class LevelSelector extends UICorePlugin {
     this.listenTo(this.core, Events.CORE_READY, this.bindPlaybackEvents)
     this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED, this.reload)
     this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_RENDERED, this.render)
+    this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_HIDE, this.hideSelectLevelMenu)
   }
 
   unBindEvents() {
     this.stopListening(this.core, Events.CORE_READY)
     this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED)
     this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_RENDERED)
+    this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_HIDE)
     this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVELS_AVAILABLE)
     this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVEL_SWITCH_START)
     this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVEL_SWITCH_END)
@@ -126,6 +128,8 @@ export default class LevelSelector extends UICorePlugin {
   }
 
   onShowLevelSelectMenu(event) { this.toggleContextMenu() }
+
+  hideSelectLevelMenu() { this.$('.level_selector ul').hide() }
 
   toggleContextMenu() { this.$('.level_selector ul').toggle() }
 
