@@ -40,6 +40,7 @@ export default class LevelSelector extends UICorePlugin {
     this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVELS_AVAILABLE)
     this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVEL_SWITCH_START)
     this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVEL_SWITCH_END)
+    this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_BITRATE)
   }
 
   bindPlaybackEvents() {
@@ -79,7 +80,6 @@ export default class LevelSelector extends UICorePlugin {
       this.$el.html(this.template({'levels':this.levels, 'title': this.getTitle()}))
       this.$el.append(style)
       this.core.mediaControl.$('.media-control-right-panel').append(this.el)
-      this.updateText(this.selectedLevelId)
       this.highlightCurrentLevel()
     }
     return this
@@ -122,7 +122,6 @@ export default class LevelSelector extends UICorePlugin {
     this.core.getCurrentPlayback().currentLevel = this.selectedLevelId
 
     this.toggleContextMenu()
-    this.updateText(this.selectedLevelId)
 
     event.stopPropagation()
     return false
@@ -142,10 +141,7 @@ export default class LevelSelector extends UICorePlugin {
 
   startLevelSwitch() { this.buttonElement().addClass('changing') }
 
-  stopLevelSwitch() {
-    this.buttonElement().removeClass('changing')
-    this.updateText(this.selectedLevelId)
-  }
+  stopLevelSwitch() { this.buttonElement().removeClass('changing') }
 
   updateText(level) {
     if (level === AUTO) {
@@ -163,5 +159,6 @@ export default class LevelSelector extends UICorePlugin {
   highlightCurrentLevel() {
     this.levelElement().removeClass('current')
     this.currentLevel && this.levelElement(this.currentLevel.id).addClass('current')
+    this.updateText(this.selectedLevelId)
   }
 }
