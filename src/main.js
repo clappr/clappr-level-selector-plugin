@@ -102,12 +102,13 @@ export default class LevelSelector extends UICorePlugin {
         throw new TypeError('labelCallback must be a function')
     }
     
-    var labels = this.core.options.levelSelectorConfig.labels
+    var hasLabels = this.core.options.levelSelectorConfig.labels
+    var labels = hasLabels ? this.core.options.levelSelectorConfig.labels : {};
     
-    if(labelCallback || labels)
+    if(labelCallback || hasLabels)
     {
-        var level;
-        var label;
+        var level
+        var label
         for(var levelId in this.levels) {
             level = this.levels[levelId]
             label = labels[level.id] 
