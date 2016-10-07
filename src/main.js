@@ -96,10 +96,31 @@ export default class LevelSelector extends UICorePlugin {
   configureLevelsLabels() {
     if (this.core.options.levelSelectorConfig === undefined) return
 
-    for (var levelId in (this.core.options.levelSelectorConfig.labels || {})) {
-      levelId = parseInt(levelId, 10)
-      var thereIsLevel = !!this.findLevelBy(levelId)
-      thereIsLevel && this.changeLevelLabelBy(levelId, this.core.options.levelSelectorConfig.labels[levelId])
+    var labelCallback = this.core.options.levelSelectorConfig.labelCallback
+    if(labelCallback && typeof labelCallback !== 'function')
+    {
+        throw new TypeError('labelCallback must be a function')
+    }
+    
+    var hasLabels = this.core.options.levelSelectorConfig.labels
+    var labels = hasLabels ? this.core.options.levelSelectorConfig.labels : {};
+    
+    if(labelCallback || hasLabels)
+    {
+        var level
+        var label
+        for(var levelId in this.levels) {
+            level = this.levels[levelId]
+            label = labels[level.id] 
+            if(labelCallback)
+            {
+                level.label = labelCallback(level,label)
+            }
+            else if(label)
+            {
+                level.label = label
+            }
+        }
     }
   }
 
@@ -107,14 +128,6 @@ export default class LevelSelector extends UICorePlugin {
     var foundLevel
     this.levels.forEach((level) => { if (level.id === id) {foundLevel = level} })
     return foundLevel
-  }
-
-  changeLevelLabelBy(id, newLabel) {
-    this.levels.forEach((level, index) => {
-      if (level.id === id) {
-        this.levels[index].label = newLabel
-      }
-    })
   }
 
   onLevelSelect(event) {
