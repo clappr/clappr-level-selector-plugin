@@ -5,13 +5,18 @@ var filename = 'level-selector.js'
 module.exports = {
   entry: path.resolve(__dirname, 'index.js'),
   externals: {
-    "Clappr": "Clappr",
-    "clappr-zepto": "clappr-zepto"
+    clappr: {
+      amd: 'clappr',
+      commonjs: 'clappr',
+      commonjs2: 'clappr',
+      root: 'Clappr'
+    }
   },
   module: {
     loaders: [
       {
         test: /\.js$/,
+        exclude: /node_modules/,
         loader: 'babel',
         query: {
             compact: true,

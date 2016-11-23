@@ -4,7 +4,7 @@
   "version": "0.1.10",
   "license": "MIT",
   "repository": "clappr/clappr-level-selector-plugin",
-  "main": "index.js",
+  "main": "dist/level-selector.js",
   "scripts": {
     "release": "node_modules/.bin/webpack --progress -d --optimize-minimize --optimize-dedupe --output-filename level-selector.min.js",
     "build": "node_modules/.bin/webpack --progress",
@@ -32,9 +32,8 @@
     "clappr",
     "plugin"
   ],
-  "dependencies": {
-    "clappr": "latest",
-    "clappr-zepto": "latest"
+  "peerDependencies": {
+    "clappr": "0.x"
   },
   "devDependencies": {
     "babel-core": "^5.8.25",
