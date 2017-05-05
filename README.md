@@ -1,5 +1,7 @@
 # Clappr Level Selector Plugin
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/clappr/clappr-level-selector-plugin.svg)](https://greenkeeper.io/)
+
 <img src="https://raw.githubusercontent.com/lucasmundim/clappr-level-selector-plugin/master/screenshot.png"/>
 
 ## Usage
