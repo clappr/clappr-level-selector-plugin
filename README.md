@@ -49,7 +49,7 @@ var player = new Clappr.Player({
 *Note: There is a minified version served through CDNs too:*
 ```html
 <script type="text/javascript"
-        src="//cdn.jsdelivr.net/clappr.level-selector/latest/level-selector.min.js"></script>
+        src="//cdn.jsdelivr.net/gh/clappr/clappr-level-selector-plugin@latest/dist/level-selector.min.js"></script>
 ```
 
 ## Compatibility
