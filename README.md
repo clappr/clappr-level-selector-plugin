@@ -18,9 +18,7 @@ Then just add `LevelSelector` into the list of plugins of your player instance:
 ```javascript
 var player = new Clappr.Player({
   source: "http://your.video/here.m3u8",
-  plugins: {
-    'core': [LevelSelector]
-  }
+  plugins: [LevelSelector]
 });
 ```
 
@@ -29,9 +27,7 @@ You can also customize the labels and title:
 ```javascript
 var player = new Clappr.Player({
   source: "http://your.video/here.m3u8",
-  plugins: {
-    'core': [LevelSelector]
-  },
+  plugins: [LevelSelector],
   levelSelectorConfig: {
     title: 'Quality',
     labels: {
