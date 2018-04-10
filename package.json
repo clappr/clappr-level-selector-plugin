@@ -1,7 +1,7 @@
 {
   "name": "level-selector",
   "description": "A simple plugin for Clappr that adds support to manually select level on multi-bitrate streams.",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "license": "MIT",
   "repository": "clappr/clappr-level-selector-plugin",
   "main": "dist/level-selector.js",
