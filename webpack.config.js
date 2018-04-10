@@ -9,17 +9,15 @@ module.exports = {
     "clappr-zepto": "clappr-zepto"
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
-        loader: 'babel',
-        query: {
-            compact: true,
-        }
+        loader: 'babel-loader',
+        exclude: /node_modules/
       },
       {
         test: /\.scss$/,
-        loaders: ['css', 'sass?includePaths[]='
+        loaders: ['style-loader?singleton=true', 'css-loader', 'postcss-loader', 'sass-loader?includePaths[]='
           + path.resolve(__dirname, './node_modules/compass-mixins/lib')
           + '&includePaths[]='
           + path.resolve(__dirname, './node_modules/clappr/src/base/scss')
@@ -29,12 +27,16 @@ module.exports = {
         include: path.resolve(__dirname, 'src'),
       },
       {
-        test: /\.html/, loader: 'html?minimize=false'
+        test: /\.html/, loader: 'html-loader?minimize=false'
       },
     ],
   },
   resolve: {
-    extensions: ['', '.js'],
+    modules: [
+      path.resolve(__dirname, 'src'),
+      'node_modules'
+    ],
+    extensions: ['.js'],
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -43,4 +45,10 @@ module.exports = {
     library: 'LevelSelector',
     libraryTarget: 'umd',
   },
+  devServer: {
+    contentBase: 'public/',
+    host: '0.0.0.0',
+    disableHostCheck: true,
+    inline: false
+  }
 };

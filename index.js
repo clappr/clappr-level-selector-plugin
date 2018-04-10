@@ -1,2 +1,3 @@
-export default require('./src/main.js')
+import LevelSelector from './src/main.js'
 
+export default LevelSelector

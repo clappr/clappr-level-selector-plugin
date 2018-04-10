@@ -4,12 +4,12 @@
   "version": "0.1.10",
   "license": "MIT",
   "repository": "clappr/clappr-level-selector-plugin",
-  "main": "index.js",
+  "main": "dist/level-selector.js",
   "scripts": {
     "release": "node_modules/.bin/webpack --progress -d --optimize-minimize --optimize-dedupe --output-filename level-selector.min.js",
     "build": "node_modules/.bin/webpack --progress",
     "watch": "node_modules/.bin/webpack --progress --watch",
-    "test": "karma start --single-run --browsers Chrome",
+    "test": "echo 'No tests configured - aborting.'",
     "start": "node_modules/.bin/webpack-dev-server --content-base public/ --output-public-path /latest --hot",
     "lock": "rm -rf npm-shrinkwrap.json node_modules && npm install --silent && npm shrinkwrap"
   },
