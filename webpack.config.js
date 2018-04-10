@@ -1,12 +1,11 @@
-var path = require('path');
-var webpack = require('webpack');
-var filename = 'level-selector.js'
+const path = require('path')
+const filename = 'level-selector.js'
 
 module.exports = {
   entry: path.resolve(__dirname, 'index.js'),
   externals: {
-    "Clappr": "Clappr",
-    "clappr-zepto": "clappr-zepto"
+    'Clappr': 'Clappr',
+    'clappr-zepto': 'clappr-zepto'
   },
   module: {
     rules: [
@@ -51,4 +50,4 @@ module.exports = {
     disableHostCheck: true,
     inline: false
   }
-};
+}
