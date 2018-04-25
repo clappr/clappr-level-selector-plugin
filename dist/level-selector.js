@@ -1,10 +1,10 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("Clappr"));
+		module.exports = factory(require("clappr"));
 	else if(typeof define === 'function' && define.amd)
-		define(["Clappr"], factory);
+		define(["clappr"], factory);
 	else if(typeof exports === 'object')
-		exports["LevelSelector"] = factory(require("Clappr"));
+		exports["LevelSelector"] = factory(require("clappr"));
 	else
 		root["LevelSelector"] = factory(root["Clappr"]);
 })(typeof self !== 'undefined' ? self : this, function(__WEBPACK_EXTERNAL_MODULE_83__) {
@@ -733,264 +733,15 @@ exports.f = __webpack_require__(2) ? gOPD : function getOwnPropertyDescriptor(O,
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _main = __webpack_require__(40);
-
-var _main2 = _interopRequireDefault(_main);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = _main2.default;
-module.exports = exports['default'];
+Object.defineProperty(exports,"__esModule",{value:true});var _main=__webpack_require__(40);var _main2=_interopRequireDefault(_main);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj};}exports.default=_main2.default;module.exports=exports['default'];
 
 /***/ }),
 /* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _classCallCheck2 = __webpack_require__(41);
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _createClass2 = __webpack_require__(42);
-
-var _createClass3 = _interopRequireDefault(_createClass2);
-
-var _possibleConstructorReturn2 = __webpack_require__(47);
-
-var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
-
-var _inherits2 = __webpack_require__(75);
-
-var _inherits3 = _interopRequireDefault(_inherits2);
-
-var _Clappr = __webpack_require__(83);
-
-var _levelSelector = __webpack_require__(84);
-
-var _levelSelector2 = _interopRequireDefault(_levelSelector);
-
-var _style = __webpack_require__(85);
-
-var _style2 = _interopRequireDefault(_style);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var AUTO = -1;
-
-var LevelSelector = function (_UICorePlugin) {
-  (0, _inherits3.default)(LevelSelector, _UICorePlugin);
-
-  function LevelSelector() {
-    (0, _classCallCheck3.default)(this, LevelSelector);
-    return (0, _possibleConstructorReturn3.default)(this, _UICorePlugin.apply(this, arguments));
-  }
-
-  LevelSelector.prototype.bindEvents = function bindEvents() {
-    this.listenTo(this.core, _Clappr.Events.CORE_READY, this.bindPlaybackEvents);
-    this.listenTo(this.core.mediaControl, _Clappr.Events.MEDIACONTROL_CONTAINERCHANGED, this.reload);
-    this.listenTo(this.core.mediaControl, _Clappr.Events.MEDIACONTROL_RENDERED, this.render);
-    this.listenTo(this.core.mediaControl, _Clappr.Events.MEDIACONTROL_HIDE, this.hideSelectLevelMenu);
-  };
-
-  LevelSelector.prototype.unBindEvents = function unBindEvents() {
-    this.stopListening(this.core, _Clappr.Events.CORE_READY);
-    this.stopListening(this.core.mediaControl, _Clappr.Events.MEDIACONTROL_CONTAINERCHANGED);
-    this.stopListening(this.core.mediaControl, _Clappr.Events.MEDIACONTROL_RENDERED);
-    this.stopListening(this.core.mediaControl, _Clappr.Events.MEDIACONTROL_HIDE);
-    this.stopListening(this.core.getCurrentPlayback(), _Clappr.Events.PLAYBACK_LEVELS_AVAILABLE);
-    this.stopListening(this.core.getCurrentPlayback(), _Clappr.Events.PLAYBACK_LEVEL_SWITCH_START);
-    this.stopListening(this.core.getCurrentPlayback(), _Clappr.Events.PLAYBACK_LEVEL_SWITCH_END);
-    this.stopListening(this.core.getCurrentPlayback(), _Clappr.Events.PLAYBACK_BITRATE);
-  };
-
-  LevelSelector.prototype.bindPlaybackEvents = function bindPlaybackEvents() {
-    var currentPlayback = this.core.getCurrentPlayback();
-
-    this.listenTo(currentPlayback, _Clappr.Events.PLAYBACK_LEVELS_AVAILABLE, this.fillLevels);
-    this.listenTo(currentPlayback, _Clappr.Events.PLAYBACK_LEVEL_SWITCH_START, this.startLevelSwitch);
-    this.listenTo(currentPlayback, _Clappr.Events.PLAYBACK_LEVEL_SWITCH_END, this.stopLevelSwitch);
-    this.listenTo(currentPlayback, _Clappr.Events.PLAYBACK_BITRATE, this.updateCurrentLevel);
-
-    var playbackLevelsAvaialbeWasTriggered = currentPlayback.levels && currentPlayback.levels.length > 0;
-    playbackLevelsAvaialbeWasTriggered && this.fillLevels(currentPlayback.levels);
-  };
-
-  LevelSelector.prototype.reload = function reload() {
-    this.unBindEvents();
-    this.bindEvents();
-    this.bindPlaybackEvents();
-  };
-
-  LevelSelector.prototype.shouldRender = function shouldRender() {
-    if (!this.core.getCurrentContainer()) return false;
-
-    var currentPlayback = this.core.getCurrentPlayback();
-    if (!currentPlayback) return false;
-
-    var respondsToCurrentLevel = currentPlayback.currentLevel !== undefined;
-    // Only care if we have at least 2 to choose from
-    var hasLevels = !!(this.levels && this.levels.length > 1);
-
-    return respondsToCurrentLevel && hasLevels;
-  };
-
-  LevelSelector.prototype.render = function render() {
-    if (this.shouldRender()) {
-      var style = _Clappr.Styler.getStyleFor(_style2.default, { baseUrl: this.core.options.baseUrl });
-
-      this.$el.html(this.template({ 'levels': this.levels, 'title': this.getTitle() }));
-      this.$el.append(style);
-      this.core.mediaControl.$('.media-control-right-panel').append(this.el);
-      this.highlightCurrentLevel();
-    }
-    return this;
-  };
-
-  LevelSelector.prototype.fillLevels = function fillLevels(levels) {
-    var initialLevel = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : AUTO;
-
-    if (this.selectedLevelId === undefined) this.selectedLevelId = initialLevel;
-    this.levels = levels;
-    this.configureLevelsLabels();
-    this.render();
-  };
-
-  LevelSelector.prototype.configureLevelsLabels = function configureLevelsLabels() {
-    if (this.core.options.levelSelectorConfig === undefined) return;
-
-    var labelCallback = this.core.options.levelSelectorConfig.labelCallback;
-    if (labelCallback && typeof labelCallback !== 'function') throw new TypeError('labelCallback must be a function');
-
-    var hasLabels = this.core.options.levelSelectorConfig.labels;
-    var labels = hasLabels ? this.core.options.levelSelectorConfig.labels : {};
-
-    if (labelCallback || hasLabels) {
-      var level = void 0;
-      var label = void 0;
-      for (var levelId in this.levels) {
-        level = this.levels[levelId];
-        label = labels[level.id];
-        if (labelCallback) level.label = labelCallback(level, label);else if (label) level.label = label;
-      }
-    }
-  };
-
-  LevelSelector.prototype.findLevelBy = function findLevelBy(id) {
-    var foundLevel = void 0;
-    this.levels.forEach(function (level) {
-      if (level.id === id) foundLevel = level;
-    });
-    return foundLevel;
-  };
-
-  LevelSelector.prototype.onLevelSelect = function onLevelSelect(event) {
-    this.selectedLevelId = parseInt(event.target.dataset.levelSelectorSelect, 10);
-    if (this.core.getCurrentPlayback().currentLevel == this.selectedLevelId) return false;
-    this.core.getCurrentPlayback().currentLevel = this.selectedLevelId;
-
-    this.toggleContextMenu();
-
-    event.stopPropagation();
-    return false;
-  };
-
-  LevelSelector.prototype.onShowLevelSelectMenu = function onShowLevelSelectMenu() {
-    this.toggleContextMenu();
-  };
-
-  LevelSelector.prototype.hideSelectLevelMenu = function hideSelectLevelMenu() {
-    this.$('.level_selector ul').hide();
-  };
-
-  LevelSelector.prototype.toggleContextMenu = function toggleContextMenu() {
-    this.$('.level_selector ul').toggle();
-  };
-
-  LevelSelector.prototype.buttonElement = function buttonElement() {
-    return this.$('.level_selector button');
-  };
-
-  LevelSelector.prototype.levelElement = function levelElement(id) {
-    return this.$('.level_selector ul a' + (!isNaN(id) ? '[data-level-selector-select="' + id + '"]' : '')).parent();
-  };
-
-  LevelSelector.prototype.getTitle = function getTitle() {
-    return (this.core.options.levelSelectorConfig || {}).title;
-  };
-
-  LevelSelector.prototype.startLevelSwitch = function startLevelSwitch() {
-    this.buttonElement().addClass('changing');
-  };
-
-  LevelSelector.prototype.stopLevelSwitch = function stopLevelSwitch() {
-    this.buttonElement().removeClass('changing');
-  };
-
-  LevelSelector.prototype.updateText = function updateText(level) {
-    if (level === AUTO) this.buttonElement().text(this.currentLevel ? 'AUTO (' + this.currentLevel.label + ')' : 'AUTO');else this.buttonElement().text(this.findLevelBy(level).label);
-  };
-
-  LevelSelector.prototype.updateCurrentLevel = function updateCurrentLevel(info) {
-    var level = this.findLevelBy(info.level);
-    this.currentLevel = level ? level : null;
-    this.highlightCurrentLevel();
-  };
-
-  LevelSelector.prototype.highlightCurrentLevel = function highlightCurrentLevel() {
-    this.levelElement().removeClass('current');
-    this.currentLevel && this.levelElement(this.currentLevel.id).addClass('current');
-    this.updateText(this.selectedLevelId);
-  };
-
-  (0, _createClass3.default)(LevelSelector, [{
-    key: 'name',
-    get: function get() {
-      return 'level_selector';
-    }
-  }, {
-    key: 'template',
-    get: function get() {
-      return (0, _Clappr.template)(_levelSelector2.default);
-    }
-  }, {
-    key: 'attributes',
-    get: function get() {
-      return {
-        'class': this.name,
-        'data-level-selector': ''
-      };
-    }
-  }, {
-    key: 'events',
-    get: function get() {
-      return {
-        'click [data-level-selector-select]': 'onLevelSelect',
-        'click [data-level-selector-button]': 'onShowLevelSelectMenu'
-      };
-    }
-  }], [{
-    key: 'version',
-    get: function get() {
-      return VERSION;
-    }
-  }]);
-  return LevelSelector;
-}(_Clappr.UICorePlugin);
-
-exports.default = LevelSelector;
-module.exports = exports['default'];
+Object.defineProperty(exports,"__esModule",{value:true});var _classCallCheck2=__webpack_require__(41);var _classCallCheck3=_interopRequireDefault(_classCallCheck2);var _createClass2=__webpack_require__(42);var _createClass3=_interopRequireDefault(_createClass2);var _possibleConstructorReturn2=__webpack_require__(47);var _possibleConstructorReturn3=_interopRequireDefault(_possibleConstructorReturn2);var _inherits2=__webpack_require__(75);var _inherits3=_interopRequireDefault(_inherits2);var _clappr=__webpack_require__(83);var _levelSelector=__webpack_require__(84);var _levelSelector2=_interopRequireDefault(_levelSelector);var _style=__webpack_require__(85);var _style2=_interopRequireDefault(_style);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj};}var AUTO=-1;var LevelSelector=function(_UICorePlugin){(0,_inherits3.default)(LevelSelector,_UICorePlugin);function LevelSelector(){(0,_classCallCheck3.default)(this,LevelSelector);return(0,_possibleConstructorReturn3.default)(this,_UICorePlugin.apply(this,arguments));}LevelSelector.prototype.bindEvents=function bindEvents(){this.listenTo(this.core,_clappr.Events.CORE_READY,this.bindPlaybackEvents);this.listenTo(this.core.mediaControl,_clappr.Events.MEDIACONTROL_CONTAINERCHANGED,this.reload);this.listenTo(this.core.mediaControl,_clappr.Events.MEDIACONTROL_RENDERED,this.render);this.listenTo(this.core.mediaControl,_clappr.Events.MEDIACONTROL_HIDE,this.hideSelectLevelMenu);};LevelSelector.prototype.unBindEvents=function unBindEvents(){this.stopListening(this.core,_clappr.Events.CORE_READY);this.stopListening(this.core.mediaControl,_clappr.Events.MEDIACONTROL_CONTAINERCHANGED);this.stopListening(this.core.mediaControl,_clappr.Events.MEDIACONTROL_RENDERED);this.stopListening(this.core.mediaControl,_clappr.Events.MEDIACONTROL_HIDE);this.stopListening(this.core.getCurrentPlayback(),_clappr.Events.PLAYBACK_LEVELS_AVAILABLE);this.stopListening(this.core.getCurrentPlayback(),_clappr.Events.PLAYBACK_LEVEL_SWITCH_START);this.stopListening(this.core.getCurrentPlayback(),_clappr.Events.PLAYBACK_LEVEL_SWITCH_END);this.stopListening(this.core.getCurrentPlayback(),_clappr.Events.PLAYBACK_BITRATE);};LevelSelector.prototype.bindPlaybackEvents=function bindPlaybackEvents(){var currentPlayback=this.core.getCurrentPlayback();this.listenTo(currentPlayback,_clappr.Events.PLAYBACK_LEVELS_AVAILABLE,this.fillLevels);this.listenTo(currentPlayback,_clappr.Events.PLAYBACK_LEVEL_SWITCH_START,this.startLevelSwitch);this.listenTo(currentPlayback,_clappr.Events.PLAYBACK_LEVEL_SWITCH_END,this.stopLevelSwitch);this.listenTo(currentPlayback,_clappr.Events.PLAYBACK_BITRATE,this.updateCurrentLevel);var playbackLevelsAvaialbeWasTriggered=currentPlayback.levels&&currentPlayback.levels.length>0;playbackLevelsAvaialbeWasTriggered&&this.fillLevels(currentPlayback.levels);};LevelSelector.prototype.reload=function reload(){this.unBindEvents();this.bindEvents();this.bindPlaybackEvents();};LevelSelector.prototype.shouldRender=function shouldRender(){if(!this.core.getCurrentContainer())return false;var currentPlayback=this.core.getCurrentPlayback();if(!currentPlayback)return false;var respondsToCurrentLevel=currentPlayback.currentLevel!==undefined;// Only care if we have at least 2 to choose from
+var hasLevels=!!(this.levels&&this.levels.length>1);return respondsToCurrentLevel&&hasLevels;};LevelSelector.prototype.render=function render(){if(this.shouldRender()){var style=_clappr.Styler.getStyleFor(_style2.default,{baseUrl:this.core.options.baseUrl});this.$el.html(this.template({'levels':this.levels,'title':this.getTitle()}));this.$el.append(style);this.core.mediaControl.$('.media-control-right-panel').append(this.el);this.highlightCurrentLevel();}return this;};LevelSelector.prototype.fillLevels=function fillLevels(levels){var initialLevel=arguments.length>1&&arguments[1]!==undefined?arguments[1]:AUTO;if(this.selectedLevelId===undefined)this.selectedLevelId=initialLevel;this.levels=levels;this.configureLevelsLabels();this.render();};LevelSelector.prototype.configureLevelsLabels=function configureLevelsLabels(){if(this.core.options.levelSelectorConfig===undefined)return;var labelCallback=this.core.options.levelSelectorConfig.labelCallback;if(labelCallback&&typeof labelCallback!=='function')throw new TypeError('labelCallback must be a function');var hasLabels=this.core.options.levelSelectorConfig.labels;var labels=hasLabels?this.core.options.levelSelectorConfig.labels:{};if(labelCallback||hasLabels){var level=void 0;var label=void 0;for(var levelId in this.levels){level=this.levels[levelId];label=labels[level.id];if(labelCallback)level.label=labelCallback(level,label);else if(label)level.label=label;}}};LevelSelector.prototype.findLevelBy=function findLevelBy(id){var foundLevel=void 0;this.levels.forEach(function(level){if(level.id===id)foundLevel=level;});return foundLevel;};LevelSelector.prototype.onLevelSelect=function onLevelSelect(event){this.selectedLevelId=parseInt(event.target.dataset.levelSelectorSelect,10);if(this.core.getCurrentPlayback().currentLevel==this.selectedLevelId)return false;this.core.getCurrentPlayback().currentLevel=this.selectedLevelId;this.toggleContextMenu();event.stopPropagation();return false;};LevelSelector.prototype.onShowLevelSelectMenu=function onShowLevelSelectMenu(){this.toggleContextMenu();};LevelSelector.prototype.hideSelectLevelMenu=function hideSelectLevelMenu(){this.$('.level_selector ul').hide();};LevelSelector.prototype.toggleContextMenu=function toggleContextMenu(){this.$('.level_selector ul').toggle();};LevelSelector.prototype.buttonElement=function buttonElement(){return this.$('.level_selector button');};LevelSelector.prototype.levelElement=function levelElement(id){return this.$('.level_selector ul a'+(!isNaN(id)?'[data-level-selector-select="'+id+'"]':'')).parent();};LevelSelector.prototype.getTitle=function getTitle(){return(this.core.options.levelSelectorConfig||{}).title;};LevelSelector.prototype.startLevelSwitch=function startLevelSwitch(){this.buttonElement().addClass('changing');};LevelSelector.prototype.stopLevelSwitch=function stopLevelSwitch(){this.buttonElement().removeClass('changing');};LevelSelector.prototype.updateText=function updateText(level){if(level===AUTO)this.buttonElement().text(this.currentLevel?'AUTO ('+this.currentLevel.label+')':'AUTO');else this.buttonElement().text(this.findLevelBy(level).label);};LevelSelector.prototype.updateCurrentLevel=function updateCurrentLevel(info){var level=this.findLevelBy(info.level);this.currentLevel=level?level:null;this.highlightCurrentLevel();};LevelSelector.prototype.highlightCurrentLevel=function highlightCurrentLevel(){this.levelElement().removeClass('current');this.currentLevel&&this.levelElement(this.currentLevel.id).addClass('current');this.updateText(this.selectedLevelId);};(0,_createClass3.default)(LevelSelector,[{key:'name',get:function get(){return'level_selector';}},{key:'template',get:function get(){return(0,_clappr.template)(_levelSelector2.default);}},{key:'attributes',get:function get(){return{'class':this.name,'data-level-selector':''};}},{key:'events',get:function get(){return{'click [data-level-selector-select]':'onLevelSelect','click [data-level-selector-button]':'onShowLevelSelectMenu'};}}],[{key:'version',get:function get(){return VERSION;}}]);return LevelSelector;}(_clappr.UICorePlugin);exports.default=LevelSelector;module.exports=exports['default'];
 
 /***/ }),
 /* 41 */
@@ -1946,7 +1697,7 @@ exports = module.exports = __webpack_require__(87)(false);
 
 
 // module
-exports.push([module.i, ".level_selector[data-level-selector] {\n  float: right;\n  margin-top: 5px;\n  position: relative; }\n  .level_selector[data-level-selector] button {\n    background-color: transparent;\n    color: #fff;\n    font-family: Roboto,\"Open Sans\",Arial,sans-serif;\n    -webkit-font-smoothing: antialiased;\n    border: none;\n    font-size: 10px; }\n    .level_selector[data-level-selector] button:hover {\n      color: #c9c9c9; }\n    .level_selector[data-level-selector] button.changing {\n      -webkit-animation: pulse 0.5s infinite alternate; }\n  .level_selector[data-level-selector] > ul {\n    list-style-type: none;\n    position: absolute;\n    bottom: 25px;\n    border: 1px solid black;\n    display: none;\n    background-color: #e6e6e6; }\n  .level_selector[data-level-selector] li {\n    font-size: 10px; }\n    .level_selector[data-level-selector] li[data-title] {\n      background-color: #c3c2c2;\n      padding: 5px; }\n    .level_selector[data-level-selector] li a {\n      color: #444;\n      padding: 2px 10px;\n      display: block;\n      text-decoration: none; }\n      .level_selector[data-level-selector] li a:hover {\n        background-color: #555;\n        color: white; }\n        .level_selector[data-level-selector] li a:hover a {\n          color: white;\n          text-decoration: none; }\n    .level_selector[data-level-selector] li.current a {\n      color: #f00; }\n", ""]);
+exports.push([module.i, ".level_selector[data-level-selector] {\n  float: right;\n  position: relative;\n  height: 100%; }\n  .level_selector[data-level-selector] button {\n    background-color: transparent;\n    color: #fff;\n    font-family: Roboto,\"Open Sans\",Arial,sans-serif;\n    -webkit-font-smoothing: antialiased;\n    border: none;\n    font-size: 10px;\n    height: 100%; }\n    .level_selector[data-level-selector] button:hover {\n      color: #c9c9c9; }\n    .level_selector[data-level-selector] button.changing {\n      -webkit-animation: pulse 0.5s infinite alternate; }\n  .level_selector[data-level-selector] > ul {\n    list-style-type: none;\n    position: absolute;\n    bottom: 100%;\n    border: 1px solid black;\n    display: none;\n    background-color: #e6e6e6;\n    white-space: nowrap; }\n  .level_selector[data-level-selector] li {\n    font-size: 10px; }\n    .level_selector[data-level-selector] li[data-title] {\n      background-color: #c3c2c2;\n      padding: 5px; }\n    .level_selector[data-level-selector] li a {\n      color: #444;\n      padding: 2px 10px;\n      display: block;\n      text-decoration: none; }\n      .level_selector[data-level-selector] li a:hover {\n        background-color: #555;\n        color: white; }\n        .level_selector[data-level-selector] li a:hover a {\n          color: white;\n          text-decoration: none; }\n    .level_selector[data-level-selector] li.current a {\n      color: #f00; }\n", ""]);
 
 // exports
 
