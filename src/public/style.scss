@@ -1,7 +1,7 @@
 .level_selector[data-level-selector] {
   float: right;
-  margin-top: 5px;
   position: relative;
+  height: 100%;
 
   button {
     background-color: transparent;
@@ -10,6 +10,7 @@
     -webkit-font-smoothing: antialiased;
     border: none;
     font-size: 10px;
+    height: 100%;
 
     &:hover {
       color: #c9c9c9;
@@ -23,7 +24,7 @@
   &> ul {
     list-style-type: none;
     position: absolute;
-    bottom: 25px;
+    bottom: 100%;
     border: 1px solid black;
     display: none;
     background-color: #e6e6e6;
