@@ -34,9 +34,8 @@
     "clappr",
     "plugin"
   ],
-  "dependencies": {
-    "clappr": "latest",
-    "clappr-zepto": "latest"
+  "peerDependencies": {
+    "clappr": "0.x"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
