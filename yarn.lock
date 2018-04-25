@@ -1125,13 +1125,9 @@ clap@^1.0.9:
   dependencies:
     chalk "^1.1.3"
 
-clappr-zepto@latest:
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/clappr-zepto/-/clappr-zepto-0.0.7.tgz#a235973d668d9041af589c265e2c31fe54226fe1"
-
-clappr@latest:
-  version "0.2.90"
-  resolved "https://registry.yarnpkg.com/clappr/-/clappr-0.2.90.tgz#06501e47ef51f2be1d266a042ca7e499209b4225"
+clappr@^0.2.92:
+  version "0.2.92"
+  resolved "https://registry.yarnpkg.com/clappr/-/clappr-0.2.92.tgz#2ad4b1b9a1c57eebb5ce0d3c5fd3665b5a5c65f1"
 
 class-utils@^0.3.5:
   version "0.3.6"
