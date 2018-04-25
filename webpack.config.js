@@ -4,15 +4,22 @@ const filename = 'level-selector.js'
 module.exports = {
   entry: path.resolve(__dirname, 'index.js'),
   externals: {
-    'Clappr': 'Clappr',
-    'clappr-zepto': 'clappr-zepto'
+    clappr: {
+      amd: 'clappr',
+      commonjs: 'clappr',
+      commonjs2: 'clappr',
+      root: 'Clappr'
+    }
   },
   module: {
     rules: [
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        exclude: /node_modules/
+        exclude: /node_modules/,
+        query: {
+          compact: true,
+        }
       },
       {
         test: /\.scss$/,
