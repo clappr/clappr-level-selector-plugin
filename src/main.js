@@ -27,24 +27,24 @@ export default class LevelSelector extends UICorePlugin {
 
   bindEvents() {
     this.listenTo(this.core, Events.CORE_READY, this.bindPlaybackEvents)
-    this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED, this.reload)
+    this.listenTo(this.core, Events.CORE_ACTIVE_CONTAINER_CHANGED, this.reload)
     this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_RENDERED, this.render)
     this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_HIDE, this.hideSelectLevelMenu)
   }
 
   unBindEvents() {
     this.stopListening(this.core, Events.CORE_READY)
-    this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED)
+    this.stopListening(this.core, Events.CORE_ACTIVE_CONTAINER_CHANGED)
     this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_RENDERED)
     this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_HIDE)
-    this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVELS_AVAILABLE)
-    this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVEL_SWITCH_START)
-    this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_LEVEL_SWITCH_END)
-    this.stopListening(this.core.getCurrentPlayback(), Events.PLAYBACK_BITRATE)
+    this.stopListening(this.core.activePlayback, Events.PLAYBACK_LEVELS_AVAILABLE)
+    this.stopListening(this.core.activePlayback, Events.PLAYBACK_LEVEL_SWITCH_START)
+    this.stopListening(this.core.activePlayback, Events.PLAYBACK_LEVEL_SWITCH_END)
+    this.stopListening(this.core.activePlayback, Events.PLAYBACK_BITRATE)
   }
 
   bindPlaybackEvents() {
-    let currentPlayback = this.core.getCurrentPlayback()
+    let currentPlayback = this.core.activePlayback
 
     this.listenTo(currentPlayback, Events.PLAYBACK_LEVELS_AVAILABLE, this.fillLevels)
     this.listenTo(currentPlayback, Events.PLAYBACK_LEVEL_SWITCH_START, this.startLevelSwitch)
@@ -62,9 +62,9 @@ export default class LevelSelector extends UICorePlugin {
   }
 
   shouldRender() {
-    if (!this.core.getCurrentContainer()) return false
+    if (!this.core.activeContainer) return false
 
-    let currentPlayback = this.core.getCurrentPlayback()
+    let currentPlayback = this.core.activePlayback
     if (!currentPlayback) return false
 
     let respondsToCurrentLevel = currentPlayback.currentLevel !== undefined
@@ -126,8 +126,8 @@ export default class LevelSelector extends UICorePlugin {
 
   onLevelSelect(event) {
     this.selectedLevelId = parseInt(event.target.dataset.levelSelectorSelect, 10)
-    if (this.core.getCurrentPlayback().currentLevel == this.selectedLevelId) return false
-    this.core.getCurrentPlayback().currentLevel = this.selectedLevelId
+    if (this.core.activePlayback.currentLevel == this.selectedLevelId) return false
+    this.core.activePlayback.currentLevel = this.selectedLevelId
 
     this.toggleContextMenu()
 
