@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <script type="text/javascript" charset="utf-8" src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://cdn.jsdelivr.net/npm/level-selector@latest/dist/level-selector.min.js"></script>
+  <title>clappr-level-selector-plugin Test Page</title>
+  <script type="text/javascript" charset="utf-8">
+  window.onload = function() {
+  var player = new Clappr.Player({
+    source: 'http://www.streambox.fr/playlists/test_001/stream.m3u8',
+    parentId: '#player-wrapper',
+
+    plugins: {
+      core: [LevelSelector],
+    },
+
+    width: 640, height: 360,
+    hideMediaControl: false,
+    autoPlay: true
+  });
+}
+  </script>
+</head>
+<body>
+  <div align="center">
+    <div id="player-wrapper">
+  </div>
+  </div>
+</body>
+</html>
