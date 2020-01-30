@@ -47,21 +47,9 @@ export default class LevelSelector extends UICorePlugin {
     this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_HIDE, this.hideSelectLevelMenu)
   }
 
-  unBindEvents() {
-    this.stopListening(this.core, Events.CORE_READY)
-    if (Events.CORE_ACTIVE_CONTAINER_CHANGED)
-      this.stopListening(this.core, Events.CORE_ACTIVE_CONTAINER_CHANGED)
-    else
-      this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED)
-    this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_RENDERED)
-    this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_HIDE)
-    this.stopListening(this.__playback, Events.PLAYBACK_LEVELS_AVAILABLE)
-    this.stopListening(this.__playback, Events.PLAYBACK_LEVEL_SWITCH_START)
-    this.stopListening(this.__playback, Events.PLAYBACK_LEVEL_SWITCH_END)
-    this.stopListening(this.__playback, Events.PLAYBACK_BITRATE)
-  }
-
   bindPlaybackEvents() {
+    if (!this.__playback) return
+
     this.listenTo(this.__playback, Events.PLAYBACK_LEVELS_AVAILABLE, this.fillLevels)
     this.listenTo(this.__playback, Events.PLAYBACK_LEVEL_SWITCH_START, this.startLevelSwitch)
     this.listenTo(this.__playback, Events.PLAYBACK_LEVEL_SWITCH_END, this.stopLevelSwitch)
@@ -72,9 +60,12 @@ export default class LevelSelector extends UICorePlugin {
   }
 
   reload() {
-    this.unBindEvents()
-    this.bindEvents()
-    this.bindPlaybackEvents()
+    this.stopListening()
+    // Ensure it stop listening before rebind events (avoid duplicate events)
+    process.nextTick(() => {
+      this.bindEvents()
+      this.bindPlaybackEvents()
+    })
   }
 
   shouldRender() {
