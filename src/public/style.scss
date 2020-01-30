@@ -22,6 +22,8 @@
   }
 
   &> ul {
+    overflow-x: hidden;
+    overflow-y: auto;
     list-style-type: none;
     position: absolute;
     bottom: 100%;

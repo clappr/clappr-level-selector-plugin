@@ -87,6 +87,7 @@ export default class LevelSelector extends UICorePlugin {
       this.$el.html(this.template({ 'levels':this.levels, 'title': this.getTitle() }))
       this.$el.append(style)
       this.core.mediaControl.$('.media-control-right-panel').append(this.el)
+      this.$('.level_selector ul').css('max-height', this.core.el.offsetHeight*0.8)
       this.highlightCurrentLevel()
     }
     return this
