@@ -67,8 +67,8 @@ export default class LevelSelector extends UICorePlugin {
     this.listenTo(this.__playback, Events.PLAYBACK_LEVEL_SWITCH_END, this.stopLevelSwitch)
     this.listenTo(this.__playback, Events.PLAYBACK_BITRATE, this.updateCurrentLevel)
 
-    let playbackLevelsAvaialbeWasTriggered = this.__playback.levels && this.__playback.levels.length > 0
-    playbackLevelsAvaialbeWasTriggered && this.fillLevels(this.__playback.levels)
+    let playbackLevelsAvailableWasTriggered = this.__playback.levels && this.__playback.levels.length > 0
+    playbackLevelsAvailableWasTriggered && this.fillLevels(this.__playback.levels)
   }
 
   reload() {
@@ -174,11 +174,13 @@ export default class LevelSelector extends UICorePlugin {
       this.buttonElement().text(this.findLevelBy(level).label)
 
   }
+
   updateCurrentLevel(info) {
     let level = this.findLevelBy(info.level)
     this.currentLevel = level ? level : null
     this.highlightCurrentLevel()
   }
+
   highlightCurrentLevel() {
     this.levelElement().removeClass('current')
     this.currentLevel && this.levelElement(this.currentLevel.id).addClass('current')
