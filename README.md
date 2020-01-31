@@ -42,6 +42,19 @@ var player = new Clappr.Player({
 });
 ```
 
+And also transform available levels:
+
+```javascript
+var player = new Clappr.Player({
+  // [...]
+  levelSelectorConfig: {
+    onLevelsAvailable: function(levels) {
+      return levels.reverse(); // For example, reverse levels order
+    },
+  },
+});
+```
+
 *Note: There is a minified version served through CDNs too:*
 ```html
 <script type="text/javascript"
