@@ -95,6 +95,15 @@ export default class LevelSelector extends UICorePlugin {
 
   fillLevels(levels, initialLevel = AUTO) {
     if (this.selectedLevelId === undefined) this.selectedLevelId = initialLevel
+
+    let onLevelsAvailable = this.core.options.levelSelectorConfig.onLevelsAvailable
+    if (onLevelsAvailable) {
+      if (typeof onLevelsAvailable === 'function')
+        levels = onLevelsAvailable(levels.slice())
+      else
+        throw new TypeError('onLevelsAvailable must be a function')
+    }
+
     this.levels = levels
     this.configureLevelsLabels()
     this.render()
