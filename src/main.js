@@ -25,49 +25,53 @@ export default class LevelSelector extends UICorePlugin {
     }
   }
 
+  get container() {
+    return this.core.activeContainer
+      ? this.core.activeContainer
+      : this.core.mediaControl.container
+  }
+
+  get playback() {
+    return this.core.activePlayback
+      ? this.core.activePlayback
+      : this.core.getCurrentPlayback()
+  }
+
   bindEvents() {
     this.listenTo(this.core, Events.CORE_READY, this.bindPlaybackEvents)
-    this.listenTo(this.core, Events.CORE_ACTIVE_CONTAINER_CHANGED, this.reload)
+    if (Events.CORE_ACTIVE_CONTAINER_CHANGED)
+      this.listenTo(this.core, Events.CORE_ACTIVE_CONTAINER_CHANGED, this.reload)
+    else
+      this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_CONTAINERCHANGED, this.reload)
     this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_RENDERED, this.render)
     this.listenTo(this.core.mediaControl, Events.MEDIACONTROL_HIDE, this.hideSelectLevelMenu)
   }
 
-  unBindEvents() {
-    this.stopListening(this.core, Events.CORE_READY)
-    this.stopListening(this.core, Events.CORE_ACTIVE_CONTAINER_CHANGED)
-    this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_RENDERED)
-    this.stopListening(this.core.mediaControl, Events.MEDIACONTROL_HIDE)
-    this.stopListening(this.core.activePlayback, Events.PLAYBACK_LEVELS_AVAILABLE)
-    this.stopListening(this.core.activePlayback, Events.PLAYBACK_LEVEL_SWITCH_START)
-    this.stopListening(this.core.activePlayback, Events.PLAYBACK_LEVEL_SWITCH_END)
-    this.stopListening(this.core.activePlayback, Events.PLAYBACK_BITRATE)
-  }
-
   bindPlaybackEvents() {
-    let currentPlayback = this.core.activePlayback
+    if (!this.playback) return
 
-    this.listenTo(currentPlayback, Events.PLAYBACK_LEVELS_AVAILABLE, this.fillLevels)
-    this.listenTo(currentPlayback, Events.PLAYBACK_LEVEL_SWITCH_START, this.startLevelSwitch)
-    this.listenTo(currentPlayback, Events.PLAYBACK_LEVEL_SWITCH_END, this.stopLevelSwitch)
-    this.listenTo(currentPlayback, Events.PLAYBACK_BITRATE, this.updateCurrentLevel)
+    this.listenTo(this.playback, Events.PLAYBACK_LEVELS_AVAILABLE, this.fillLevels)
+    this.listenTo(this.playback, Events.PLAYBACK_LEVEL_SWITCH_START, this.startLevelSwitch)
+    this.listenTo(this.playback, Events.PLAYBACK_LEVEL_SWITCH_END, this.stopLevelSwitch)
+    this.listenTo(this.playback, Events.PLAYBACK_BITRATE, this.updateCurrentLevel)
 
-    let playbackLevelsAvaialbeWasTriggered = currentPlayback.levels && currentPlayback.levels.length > 0
-    playbackLevelsAvaialbeWasTriggered && this.fillLevels(currentPlayback.levels)
+    let playbackLevelsAvailableWasTriggered = this.playback.levels && this.playback.levels.length > 0
+    playbackLevelsAvailableWasTriggered && this.fillLevels(this.playback.levels)
   }
 
   reload() {
-    this.unBindEvents()
-    this.bindEvents()
-    this.bindPlaybackEvents()
+    this.stopListening()
+    // Ensure it stop listening before rebind events (avoid duplicate events)
+    process.nextTick(() => {
+      this.bindEvents()
+      this.bindPlaybackEvents()
+    })
   }
 
   shouldRender() {
-    if (!this.core.activeContainer) return false
+    if (!this.container || !this.playback) return false
 
-    let currentPlayback = this.core.activePlayback
-    if (!currentPlayback) return false
-
-    let respondsToCurrentLevel = currentPlayback.currentLevel !== undefined
+    let respondsToCurrentLevel = this.playback.currentLevel !== undefined
     // Only care if we have at least 2 to choose from
     let hasLevels = !!(this.levels && this.levels.length > 1)
 
@@ -81,6 +85,7 @@ export default class LevelSelector extends UICorePlugin {
       this.$el.html(this.template({ 'levels':this.levels, 'title': this.getTitle() }))
       this.$el.append(style)
       this.core.mediaControl.$('.media-control-right-panel').append(this.el)
+      this.$('.level_selector ul').css('max-height', this.core.el.offsetHeight*0.8)
       this.highlightCurrentLevel()
     }
     return this
@@ -88,6 +93,15 @@ export default class LevelSelector extends UICorePlugin {
 
   fillLevels(levels, initialLevel = AUTO) {
     if (this.selectedLevelId === undefined) this.selectedLevelId = initialLevel
+
+    let onLevelsAvailable = this.core.options && this.core.options.levelSelectorConfig && this.core.options.levelSelectorConfig.onLevelsAvailable
+    if (onLevelsAvailable) {
+      if (typeof onLevelsAvailable === 'function')
+        levels = onLevelsAvailable(levels.slice())
+      else
+        throw new TypeError('onLevelsAvailable must be a function')
+    }
+
     this.levels = levels
     this.configureLevelsLabels()
     this.render()
@@ -126,8 +140,8 @@ export default class LevelSelector extends UICorePlugin {
 
   onLevelSelect(event) {
     this.selectedLevelId = parseInt(event.target.dataset.levelSelectorSelect, 10)
-    if (this.core.activePlayback.currentLevel == this.selectedLevelId) return false
-    this.core.activePlayback.currentLevel = this.selectedLevelId
+    if (this.playback.currentLevel == this.selectedLevelId) return false
+    this.playback.currentLevel = this.selectedLevelId
 
     this.toggleContextMenu()
 
@@ -159,11 +173,13 @@ export default class LevelSelector extends UICorePlugin {
       this.buttonElement().text(this.findLevelBy(level).label)
 
   }
+
   updateCurrentLevel(info) {
     let level = this.findLevelBy(info.level)
     this.currentLevel = level ? level : null
     this.highlightCurrentLevel()
   }
+
   highlightCurrentLevel() {
     this.levelElement().removeClass('current')
     this.currentLevel && this.levelElement(this.currentLevel.id).addClass('current')

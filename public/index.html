@@ -2,24 +2,30 @@
 <html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <script type="text/javascript" charset="utf-8" src="/latest/clappr.min.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/clappr@0.2.100/dist/clappr.min.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dash-shaka-playback@latest/dist/dash-shaka-playback.min.js"></script>
   <script type="text/javascript" charset="utf-8" src="/latest/level-selector.js"></script>
   <title>clappr-level-selector-plugin Test Page</title>
   <script type="text/javascript" charset="utf-8">
-  window.onload = function() {
-  var player = new Clappr.Player({
-    source: 'http://www.streambox.fr/playlists/test_001/stream.m3u8',
-    parentId: '#player-wrapper',
+  document.addEventListener("DOMContentLoaded", function() {
+    console.log('Clappr version ' + Clappr.version);
 
-    plugins: {
-      core: [LevelSelector],
-    },
+    var player = new Clappr.Player({
+      // source: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+      source: 'https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd',
+      parentId: '#player-wrapper',
+      plugins: [
+        LevelSelector,
+        DashShakaPlayback,
+      ],
+      width: 640,
+      height: 360,
+      hideMediaControl: false,
+      autoPlay: true
+    });
 
-    width: 640, height: 360,
-    hideMediaControl: false,
-    autoPlay: true
   });
-}
   </script>
 </head>
 <body>

@@ -22,6 +22,8 @@
   }
 
   &> ul {
+    overflow-x: hidden;
+    overflow-y: auto;
     list-style-type: none;
     position: absolute;
     bottom: 100%;
@@ -41,7 +43,7 @@
 
     a {
       color: #eee;
-      padding: 5px 10px;
+      padding: 5px 18px;
       display: block;
       text-decoration: none;
 
